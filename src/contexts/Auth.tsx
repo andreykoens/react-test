@@ -43,12 +43,12 @@ export const ContextAuthProvider: React.FC<FCProps> = ({
   const getUserData = useCallback(() => {
     apiPost('/me', {}, (data: IUser) => {
       setUser(data)
+      setIsLogged(true)
     })
   }, [])
   const login = useCallback(
     (props: ILogin) => {
       apiPost<ILogin, ILogin>('/login', props, (data) => {
-        setIsLogged(true)
         getUserData()
       })
     },

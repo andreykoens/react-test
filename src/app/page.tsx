@@ -4,13 +4,15 @@ import React, { useCallback, useContext, useEffect, useState } from 'react'
 import { ContextAuth } from 'contexts/Auth'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
+import { apiPost } from 'utils/api'
+import { IRecordPost } from 'types/api'
 
 export default function Home() {
   /*================================ Constants ==============================*/
-  const { isLoaded, isLogged, login, logout, user } = useContext(ContextAuth)
+  const { isLoaded, isLogged, logout, user } = useContext(ContextAuth)
   const router = useRouter()
   /*================================ States ==============================*/
-  const [valueListaPosts, SetValueListaPosts] = useState<any>(null)
+  const [recordsPosts, setRecordsPosts] = useState<any>(null)
   const [valueCriaPost, SetValueCriaPost] = useState<any>(null)
   const [valueBuscaPost, SetValueBuscaPost] = useState<any>(null)
   const [valueAtualizaPost, SetValueAtualizaPost] = useState<any>(null)
@@ -21,14 +23,11 @@ export default function Home() {
   const [valueAtualizaComment, SetValueAtualizaComment] = useState<any>(null)
   const [valueRemoveComment, SetValueRemoveComment] = useState<any>(null)
   /*================================ Functions ==============================*/
-  const ListaPosts = useCallback(() => {
-    window.FakerApi.get('/posts', {})
-      .catch((error: any) => {
-        console.error(error)
-      })
-      .then((response: any) => {
-        SetValueListaPosts(response)
-      })
+  const getPosts = useCallback(() => {
+    apiPost('/posts', {}, (data: Record<string | number, IRecordPost>) => {
+      delete data['message']
+      setRecordsPosts(Object.values(data))
+    })
   }, [])
   const CriaPost = useCallback(() => {
     window.FakerApi.post('/posts/create', { title: 'teste', content: 'teste' })
@@ -126,9 +125,9 @@ export default function Home() {
   /*================================ Effects ==============================*/
   useEffect(() => {
     if (!isLoaded) return
-    ListaPosts()
-    ListaComments()
-  }, [ListaComments, ListaPosts, isLoaded])
+    getPosts()
+    // ListaComments()
+  }, [ListaComments, getPosts, isLoaded])
   /*================================ Memos ==============================*/
   /*================================ Render ==============================*/
   return (
@@ -164,21 +163,9 @@ export default function Home() {
           </button>
         </div>
       )}
+
+      <br />
       <hr />
-      <br />
-      <br />
-      <br />
-      <h1>Posts</h1>
-      <div>{JSON.stringify(valueListaPosts, null, 2)}</div>
-      <hr />
-      <button
-        onClick={() => {
-          ListaPosts()
-        }}
-      >
-        Atualizar lista de posts
-      </button>
-      <div>{JSON.stringify(valueBuscaPost, null, 2)}</div>
       <button
         onClick={() => {
           BuscaPost()
@@ -186,92 +173,25 @@ export default function Home() {
       >
         BuscaPost
       </button>
+      <div>{JSON.stringify(valueBuscaPost, null, 2)}</div>
       <hr />
-      <h1>Page</h1>
-      <br />
-      <div>{JSON.stringify(valueListaComments, null, 2)}</div>
-      <button
-        onClick={() => {
-          ListaComments()
-        }}
-      >
-        ListaComments
-      </button>
-      <br />
-      <div>{JSON.stringify(valueBuscaComment, null, 2)}</div>
-      <button
-        onClick={() => {
-          BuscaComment()
-        }}
-      >
-        BuscaComment
-      </button>
-      {isLogged && (
-        <div style={{ border: '1px solid black', padding: '10px' }}>
-          <h3>logged user comment</h3>
-          <div>{JSON.stringify(valueCriaComment, null, 2)}</div>
-          <button
-            onClick={() => {
-              CriaComment()
-            }}
-          >
-            CriaComment
-          </button>
 
-          <br />
-          <div>{JSON.stringify(valueAtualizaComment, null, 2)}</div>
-          <button
-            onClick={() => {
-              AtualizaComment()
-            }}
+      {/*================== POSTS =================*/}
+      {recordsPosts &&
+        recordsPosts.map((post: IRecordPost) => (
+          <div
+            key={`post-${post.id}`}
+            style={{ border: '1px solid black', padding: '10px', margin: '0 0 10px 0' }}
           >
-            AtualizaComment
-          </button>
-          <br />
-          <div>{JSON.stringify(valueRemoveComment, null, 2)}</div>
-          <button
-            onClick={() => {
-              RemoveComment()
-            }}
-          >
-            RemoveComment
-          </button>
-        </div>
-      )}
-      <br />
-      {isLogged && (
-        <div style={{ background: '#ddd' }}>
-          <h1>Admin</h1>
-          <div>{JSON.stringify(valueCriaPost, null, 2)}</div>
-          <button
-            onClick={() => {
-              CriaPost()
-            }}
-          >
-            CriaPost
-          </button>
-
-          <br />
-          <div>{JSON.stringify(valueAtualizaPost, null, 2)}</div>
-          <button
-            onClick={() => {
-              AtualizaPost()
-            }}
-          >
-            AtualizaPost
-          </button>
-          <br />
-          <div>{JSON.stringify(valueRemovePost, null, 2)}</div>
-          <button
-            onClick={() => {
-              RemovePost()
-            }}
-          >
-            RemovePost
-          </button>
-          <br />
-        </div>
-      )}
+            <h2>
+              <Link href={`/post/${post.id}`}>{post.title}</Link>
+            </h2>
+            <small>Written by {post.user_id}</small>
+            <p>content</p>
+            {post.comments && <>{JSON.stringify(post, null, 2)}</>}
+            {!post.comments && <>Leave a comment</>}
+          </div>
+        ))}
     </main>
   )
 }

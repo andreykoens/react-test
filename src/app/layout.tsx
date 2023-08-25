@@ -14,6 +14,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <Script src="fakerApi.js"></Script>
       <body>
         <ContextAuthProvider>{children}</ContextAuthProvider>
+        {/*================== FOOTER =================*/}
+        <footer>Written hastily by Andrey Koens, 2023 💖</footer>
       </body>
     </html>
   )
