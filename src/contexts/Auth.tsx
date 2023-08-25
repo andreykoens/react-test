@@ -1,113 +1,87 @@
 'use client'
 
-import React, { createContext, useCallback, useContext, useMemo, useState } from 'react'
+import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
+import { ILogin, IUser } from 'types/api'
+import { apiPost } from 'utils/api'
 
 declare global {
   interface Window {
     FakerApi: any
   }
 }
-interface ILogin {
-  username: string
-  password: string
-}
-
-interface IRegister {
-  name: string
-  username: string
-  password: string
-}
 
 interface IContextAuth {
-  Login({}: ILogin): any
-  Logout: any
-  Register({}: IRegister): any
-  Me: any
+  user: IUser
   isLogged: boolean
+  login: (props: ILogin) => void
+  logout: () => void
 }
-interface IContextAuthValue {
-  Login: any
-  Logout: any
-  Register: any
-  Me: any
-  isLogged: boolean
+
+interface FCProps {
+  children: React.ReactNode
 }
 
 export const ContextAuth = createContext({} as IContextAuth)
 
-export const ContextAuthProvider: React.FC = ({ children }) => {
+export const ContextAuthProvider: React.FC<FCProps> = ({
+  children,
+}: {
+  children: React.ReactNode
+}) => {
   /*================================ Constants ==============================*/
   /*================================ States ==============================*/
-  const [valueLogin, SetValueLogin] = useState<any>(null)
-  const [valueLogout, SetValueLogout] = useState<string>('')
-  const [valueRegister, SetValueRegister] = useState<any>(null)
-  const [valueMe, SetValueMe] = useState<any>(null)
+  const [user, setUser] = useState<any>(null)
   const [isLogged, setIsLogged] = useState<boolean>(false)
+  const [isLoaded, setIsLoaded] = useState<boolean>(false)
 
   /*================================ Functions ==============================*/
   const Reset = useCallback(() => {
-    SetValueLogin(null)
-    SetValueRegister(null)
-    SetValueMe(null)
+    setUser(null)
     setIsLogged(false)
   }, [])
-
-  const Login = useCallback((props: ILogin) => {
-    console.log(props)
-    window.FakerApi.post('/login', props)
-      .catch((error: any) => {
-        console.error(error)
-      })
-      .then((response: any) => {
-        SetValueLogin(response)
-      })
+  const getUserData = useCallback(() => {
+    apiPost('/me', {}, (data: IUser) => {
+      setUser(data)
+    })
   }, [])
-  const Logout = useCallback(() => {
-    window.FakerApi.post('/logout', {})
-      .catch((response: any) => {
-        console.log('error')
+  const login = useCallback(
+    (props: ILogin) => {
+      apiPost<ILogin, ILogin>('/login', props, (data) => {
+        setIsLogged(true)
+        getUserData()
       })
-      .then((response: any) => {
-        SetValueLogout('loggedOut')
-        Reset()
-      })
+    },
+    [getUserData]
+  )
+  const logout = useCallback(() => {
+    apiPost('/logout', {}, () => {
+      setIsLogged(false)
+      Reset()
+    })
   }, [Reset])
-  const Register = useCallback((props: IRegister) => {
-    window.FakerApi.post('/register', props)
-      .catch((error: any) => {
-        console.error(error)
-      })
-      .then((response: any) => {
-        SetValueRegister(response)
-      })
-  }, [])
-  const Me = useCallback(() => {
-    window.FakerApi.get('/me', {})
-      .catch((error: any) => {
-        console.error(error)
-      })
-      .then((response: any) => {
-        SetValueMe(response)
-      })
-  }, [])
 
   /*================================ Effects ==============================*/
+  // Hacky-ish, will work for the mock-up
+  useEffect(() => {
+    if (isLoaded) return
+    setTimeout(() => {
+      if (!window.FakerApi) {
+        setIsLoaded(false)
+      } else {
+        getUserData()
+        setIsLoaded(true)
+      }
+    }, 50)
+  }, [isLoaded, getUserData])
   /*================================ Memos ==============================*/
-  const contextAuthValue: IContextAuthValue = useMemo(
+  const contextAuthValue: IContextAuth = useMemo(
     () => ({
-      data: {
-        valueLogin,
-        valueLogout,
-        valueRegister,
-        valueMe,
-        isLogged,
-      },
-      Login,
-      Logout,
-      Register,
-      Me,
+      user,
+      isLogged,
+      login,
+      logout,
     }),
-    [Login, Logout, Me, Register, valueLogin, valueLogout, valueMe, valueRegister]
+    [login, logout, isLogged, user]
   )
 
   /*================================ Render ==============================*/

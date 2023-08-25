@@ -130,10 +130,9 @@ export default function Home() {
   /*================================ Render ==============================*/
   return (
     <main>
-      <pre>{JSON.stringify(auth, null, 2)}</pre>
       <button
         onClick={() => {
-          auth.Login({ username: 'teste', password: 'teste' })
+          auth.login({ username: 'teste', password: 'teste' })
         }}
       >
         Login
@@ -141,7 +140,7 @@ export default function Home() {
       <br />
       <button
         onClick={() => {
-          auth.Logout()
+          auth.logout()
         }}
       >
         Logout
@@ -149,21 +148,13 @@ export default function Home() {
       <br />
       <button
         onClick={() => {
-          auth.Register({ name: 'teste', username: 'teste', password: 'teste' })
+          // auth.Register({ name: 'teste', username: 'teste', password: 'teste' })
         }}
       >
         Register
       </button>
       <br />
-
-      <button
-        onClick={() => {
-          auth.Me('', '')
-        }}
-      >
-        Me
-      </button>
-      <br />
+      {auth.isLogged && <div>{JSON.stringify(auth.user, null, 2)}</div>}
 
       <hr />
       <h1>Posts</h1>
