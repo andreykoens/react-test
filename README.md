@@ -5,7 +5,7 @@
 #### Next.js
 - Currently the main framework for react web development
 - Configuration utilized:
-![image](https://github.com/andreykoens/react-test/assets/31533086/390fc413-3af5-4685-b397-d09dfe745ef6)
+![image](https://github.com/andreykoens/react-test/assets/31533086/9d6a3a76-8da5-4c64-a936-649d789d17ba)
 
 #### Chakra.ui
 - Great for fast prototyping and easy to install.
