@@ -3,81 +3,58 @@
 import React, { useCallback, useContext, useEffect, useRef, useState } from 'react'
 import { ContextAuth } from 'contexts/Auth'
 import { apiPost } from 'utils/api'
-import { IRegister } from 'types/api'
+import { ILogin } from 'types/api'
 import { useRouter } from 'next/navigation'
 import { useForm, SubmitHandler } from 'react-hook-form'
 
-export default function Register() {
+export default function Login() {
   /*================================ Constants ==============================*/
-  const { isLoaded, isLogged } = useContext(ContextAuth)
+  const { isLoaded, isLogged, login } = useContext(ContextAuth)
   const router = useRouter()
   const {
     register,
     formState: { errors },
     handleSubmit,
     watch,
-  } = useForm<IRegister>()
+  } = useForm<ILogin>()
   const password = useRef({})
   password.current = watch('password', '')
-  const usernamePattern = /^(?=[a-zA-Z0-9._]{8,20}$)(?!.*[_.]{2})[^_.].*[^_.]$/i
-
   /*================================ States ==============================*/
   /*================================ Functions ==============================*/
-  const handleRegister = useCallback(
-    (props: IRegister) => {
-      apiPost('/register', props, (data) => {
+  const handleLogin = useCallback(
+    (props: ILogin) => {
+      login({ username: 'teste', password: 'teste' })
+      /* apiPost('/login', props, (data) => {
         router.push('/')
-      })
+      }) */
     },
-    [router]
+    [login]
   )
 
-  const onSubmit: SubmitHandler<IRegister> = (data) => {
-    handleRegister(data)
+  const onSubmit: SubmitHandler<ILogin> = (data) => {
+    handleLogin(data)
   }
   /*================================ Effects ==============================*/
   useEffect(() => {
     if (isLoaded && !isLogged) return
     router.push('/')
-  }, [isLoaded, isLogged, router])
+  }, [isLoaded, isLogged, router, login])
   /*================================ Memos ==============================*/
   /*================================ Render ==============================*/
   return (
     <main>
       <form onSubmit={(e) => e.preventDefault()}>
-        <input
-          {...register('username', {
-            required: 'You must specify a username',
-            pattern: { value: usernamePattern, message: 'Please enter a valid username' },
-          })}
-        />
-        {errors.password && <p>{errors.password.message}</p>}
-        <br />
-
-        <input {...register('name', { required: 'You must specify a name' })} />
+        <input {...register('username', { required: 'You must specify a username' })} />
         {errors.password && <p>{errors.password.message}</p>}
         <br />
 
         <input
           {...register('password', {
             required: 'You must specify a password',
-            minLength: {
-              value: 8,
-              message: 'Password must have at least 8 characters',
-            },
           })}
           type="password"
         />
         {errors.password && <p>{errors.password.message}</p>}
-        <br />
-
-        <input
-          {...register('passwordconfirm', {
-            validate: (value) => value === password.current || 'The passwords do not match',
-          })}
-          type="password"
-        />
-        {errors.passwordconfirm && <p>{errors.passwordconfirm.message}</p>}
         <br />
 
         <input type="submit" onClick={handleSubmit(onSubmit)} />

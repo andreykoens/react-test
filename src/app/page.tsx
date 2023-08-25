@@ -3,11 +3,12 @@
 import React, { useCallback, useContext, useEffect, useState } from 'react'
 import { ContextAuth } from 'contexts/Auth'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 
 export default function Home() {
   /*================================ Constants ==============================*/
-  const auth = useContext(ContextAuth)
-  const isLogged = auth.isLogged
+  const { isLoaded, isLogged, login, logout, user } = useContext(ContextAuth)
+  const router = useRouter()
   /*================================ States ==============================*/
   const [valueListaPosts, SetValueListaPosts] = useState<any>(null)
   const [valueCriaPost, SetValueCriaPost] = useState<any>(null)
@@ -124,46 +125,52 @@ export default function Home() {
   }, [])
   /*================================ Effects ==============================*/
   useEffect(() => {
-    if (!window.FakerApi) return
+    if (!isLoaded) return
     ListaPosts()
     ListaComments()
-  }, [ListaComments, ListaPosts])
+  }, [ListaComments, ListaPosts, isLoaded])
   /*================================ Memos ==============================*/
   /*================================ Render ==============================*/
   return (
     <main>
-      {!isLogged && <Link href={'/register'}>Criar uma conta</Link>}
-      <button
-        onClick={() => {
-          auth.login({ username: 'teste', password: 'teste' })
-        }}
-      >
-        Login
-      </button>
-      <br />
-      <button
-        onClick={() => {
-          auth.logout()
-        }}
-      >
-        Logout
-      </button>
-      <br />
-      <button
-        onClick={() => {
-          // auth.Register({ name: 'teste', username: 'teste', password: 'teste' })
-        }}
-      >
-        Register
-      </button>
-      <br />
-      {isLogged && <div>{JSON.stringify(auth.user, null, 2)}</div>}
-
+      <h1>React Test</h1>
+      {isLogged && (
+        <div>
+          {JSON.stringify(user, null, 2)}
+          <button
+            onClick={() => {
+              logout()
+            }}
+          >
+            Logout
+          </button>
+        </div>
+      )}
+      {!isLogged && (
+        <div>
+          <button
+            onClick={() => {
+              router.push('/login')
+            }}
+          >
+            Login
+          </button>
+          <button
+            onClick={() => {
+              router.push('/register')
+            }}
+          >
+            Register
+          </button>
+        </div>
+      )}
       <hr />
+      <br />
+      <br />
+      <br />
       <h1>Posts</h1>
       <div>{JSON.stringify(valueListaPosts, null, 2)}</div>
       <hr />
-
       <button
         onClick={() => {
           ListaPosts()
@@ -231,7 +238,6 @@ export default function Home() {
           </button>
         </div>
       )}
-
       <br />
       {isLogged && (
         <div style={{ background: '#ddd' }}>
