@@ -11,6 +11,7 @@ declare global {
 }
 
 interface IContextAuth {
+  isLoaded: boolean
   user: IUser
   isLogged: boolean
   login: (props: ILogin) => void
@@ -71,17 +72,18 @@ export const ContextAuthProvider: React.FC<FCProps> = ({
         getUserData()
         setIsLoaded(true)
       }
-    }, 50)
+    }, 25)
   }, [isLoaded, getUserData])
   /*================================ Memos ==============================*/
   const contextAuthValue: IContextAuth = useMemo(
     () => ({
+      isLoaded,
       user,
       isLogged,
       login,
       logout,
     }),
-    [login, logout, isLogged, user]
+    [isLoaded, user, isLogged, login, logout]
   )
 
   /*================================ Render ==============================*/

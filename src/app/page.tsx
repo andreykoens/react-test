@@ -2,10 +2,12 @@
 
 import React, { useCallback, useContext, useEffect, useState } from 'react'
 import { ContextAuth } from 'contexts/Auth'
+import Link from 'next/link'
 
 export default function Home() {
   /*================================ Constants ==============================*/
   const auth = useContext(ContextAuth)
+  const isLogged = auth.isLogged
   /*================================ States ==============================*/
   const [valueListaPosts, SetValueListaPosts] = useState<any>(null)
   const [valueCriaPost, SetValueCriaPost] = useState<any>(null)
@@ -130,6 +132,7 @@ export default function Home() {
   /*================================ Render ==============================*/
   return (
     <main>
+      {!isLogged && <Link href={'/register'}>Criar uma conta</Link>}
       <button
         onClick={() => {
           auth.login({ username: 'teste', password: 'teste' })
@@ -154,7 +157,7 @@ export default function Home() {
         Register
       </button>
       <br />
-      {auth.isLogged && <div>{JSON.stringify(auth.user, null, 2)}</div>}
+      {isLogged && <div>{JSON.stringify(auth.user, null, 2)}</div>}
 
       <hr />
       <h1>Posts</h1>
@@ -196,7 +199,7 @@ export default function Home() {
       >
         BuscaComment
       </button>
-      {auth.isLogged && (
+      {isLogged && (
         <div style={{ border: '1px solid black', padding: '10px' }}>
           <h3>logged user comment</h3>
           <div>{JSON.stringify(valueCriaComment, null, 2)}</div>
@@ -230,7 +233,7 @@ export default function Home() {
       )}
 
       <br />
-      {auth.isLogged && (
+      {isLogged && (
         <div style={{ background: '#ddd' }}>
           <h1>Admin</h1>
           <div>{JSON.stringify(valueCriaPost, null, 2)}</div>

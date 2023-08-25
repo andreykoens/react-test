@@ -22,6 +22,7 @@ export interface IRegister {
   name: string
   username: string
   password: string
+  passwordconfirm?: string
 }
 
 export interface IUser {
