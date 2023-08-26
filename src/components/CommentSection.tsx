@@ -1,7 +1,7 @@
 'use client'
 
 import { ContextAuth } from 'contexts/Auth'
-import { useRouter } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 import React, { useCallback, useContext, useEffect, useState } from 'react'
 import { IDeleteComment, IRecordComment } from 'types/api'
 import { apiDelete, apiGet, apiPost } from 'utils/api'
@@ -23,7 +23,6 @@ export const CommentSection: React.FC<ICommentSection> = (props) => {
     formState: { errors },
     reset,
     handleSubmit,
-    watch,
   } = useForm<IRecordComment>()
 
   /*================================ States ==============================*/
@@ -37,15 +36,16 @@ export const CommentSection: React.FC<ICommentSection> = (props) => {
   }, [post_id])
   const deleteComment = useCallback(
     (data: IDeleteComment) => {
+      if (!isLogged) return
       apiDelete('/comments/remove', { post_id: data.post_id, comment_id: data.comment_id }, () => {
-        // setCurrentComments((current) => current.filter((c) => c.id !== data.comment_id))
         getComments()
       })
     },
-    [getComments]
+    [getComments, isLogged]
   )
   const postComment = useCallback(
     (data: IRecordComment) => {
+      if (!isLogged) return
       apiPost(
         '/comments/create',
         {
@@ -58,7 +58,7 @@ export const CommentSection: React.FC<ICommentSection> = (props) => {
         }
       )
     },
-    [getComments, post_id, reset]
+    [getComments, isLogged, post_id, reset]
   )
 
   const onSubmit: SubmitHandler<any> = (data) => {
@@ -96,16 +96,39 @@ export const CommentSection: React.FC<ICommentSection> = (props) => {
 
       {/*================== CommentNew =================*/}
       <div>
-        <button
-          onClick={() => {
-            setShowBlock((current) => !current)
-          }}
-        >
-          Leave a comment
-        </button>
+        {isLogged && !showBlock && (
+          <button
+            onClick={() => {
+              setShowBlock((current) => !current)
+            }}
+          >
+            Leave a comment
+          </button>
+        )}
 
+        {!isLogged && !showBlock && (
+          <>
+            <h3>You need to be logged in to leave a comment.</h3>
+            <button
+              onClick={() => {
+                router.push('/login')
+              }}
+            >
+              Login
+            </button>
+          </>
+        )}
         {isLogged && showBlock && (
           <div style={{ border: '1px solid black', padding: '10px' }}>
+            <button
+              onClick={() => {
+                setShowBlock((current) => !current)
+              }}
+              style={{ float: 'right' }}
+            >
+              Cancelar
+            </button>
+
             <h3>Leave a comment</h3>
             <form onSubmit={(e) => e.preventDefault()}>
               <input {...register('content', { required: "You can't leave an empty comment" })} />

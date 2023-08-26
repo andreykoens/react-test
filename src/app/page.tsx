@@ -46,7 +46,9 @@ export default function Home() {
             </h2>
             <small>Written by {post.user_id}</small>
             <p>content</p>
-            <CommentSection comments={post.comments} post_id={post.id}></CommentSection>
+            {post.id && (
+              <CommentSection comments={post.comments} post_id={post.id}></CommentSection>
+            )}
           </div>
         ))}
     </main>
