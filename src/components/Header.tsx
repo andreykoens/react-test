@@ -1,9 +1,11 @@
 'use client'
 
+import { Box, Button, Flex, Heading, keyframes } from '@chakra-ui/react'
 import { ContextAuth } from 'contexts/Auth'
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import React, { useCallback, useContext, useState } from 'react'
+import { randomDrift } from 'styles/theme'
 import { Nuke, Seed } from 'utils/seeder'
 
 export const Header: React.FC = ({}) => {
@@ -27,94 +29,102 @@ export const Header: React.FC = ({}) => {
   /*================================ Effects ==============================*/
   /*================================ Render ==============================*/
   return (
-    <div>
-      <h1>
-        <Link href={'/'}>React Test</Link>
-        <button
+    <Box
+      h={'100px'}
+      borderBottom={'1px solid black'}
+      background={'#fff'}
+      position={'fixed'}
+      w={'full'}
+      zIndex={10}
+    >
+      <Heading fontSize={120} position={'fixed'} textAlign={'center'} w={'full'} mt={4}>
+        <Button
+          mr={-20}
+          mt={16}
+          borderRadius={50}
+          animation={`${keyframes`${randomDrift(50)}`} infinite 150s linear`}
+          variant={'ghost'}
+          fontSize={60}
           onClick={() => {
             Seed()
           }}
         >
-          Seed
-        </button>
-        <button
+          🍃
+        </Button>{' '}
+        <Link href={'/'}>Gibberish™️</Link>
+        <Button
+          ml={-20}
+          mt={16}
+          borderRadius={50}
+          animation={`${keyframes`${randomDrift(50)}`} infinite 150s linear`}
+          variant={'ghost'}
+          fontSize={60}
           onClick={() => {
             logout()
             Nuke()
           }}
         >
-          Nuke
-        </button>
-      </h1>
+          💥
+        </Button>
+      </Heading>
+
       {isLogged && (
-        <div>
+        <Box>
           {JSON.stringify(user, null, 2)}
           {!pathname.includes('dashboard') && (
-            <button
+            <Button
               onClick={() => {
                 router.push('/dashboard/posts/list')
               }}
             >
               Dashboard
-            </button>
+            </Button>
           )}
           {pathname.includes('dashboard') && (
             <span>
-              <button
+              <Button
                 onClick={() => {
                   router.push('/dashboard/posts/list')
                 }}
               >
                 View Posts
-              </button>
-              <button
+              </Button>
+              <Button
                 onClick={() => {
                   router.push('/dashboard/comments')
                 }}
               >
                 View Comments
-              </button>
+              </Button>
             </span>
           )}
-          <button
+          <Button
             onClick={() => {
               logout()
             }}
           >
             Logout
-          </button>
-        </div>
+          </Button>
+        </Box>
       )}
       {!isLogged && (
-        <div>
-          <button
+        <Box>
+          <Button
             onClick={() => {
               router.push('/login')
             }}
           >
             Login
-          </button>
-          <button
+          </Button>
+          <Button
             onClick={() => {
               router.push('/register')
             }}
           >
             Register
-          </button>
-        </div>
+          </Button>
+        </Box>
       )}
-
-      <br />
-      {/* <hr />
-      <button
-        onClick={() => {
-          BuscaPost()
-        }}
-      >
-        BuscaPost
-      </button>
-      <div>{JSON.stringify(valueBuscaPost, null, 2)}</div>
-      <hr /> */}
-    </div>
+    </Box>
   )
 }

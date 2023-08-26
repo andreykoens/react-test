@@ -10,12 +10,19 @@ declare global {
   }
 }
 
+interface INameIndexItem {
+  id: number
+  name: string
+}
+
 interface IContextAuth {
   isLoaded: boolean
   user: IUser
   isLogged: boolean
   login: (props: ILogin) => void
   logout: () => void
+  nameIndex: INameIndexItem[]
+  buildNameIndex: () => void
 }
 
 interface FCProps {
@@ -34,6 +41,7 @@ export const ContextAuthProvider: React.FC<FCProps> = ({
   const [user, setUser] = useState<any>(null)
   const [isLogged, setIsLogged] = useState<boolean>(false)
   const [isLoaded, setIsLoaded] = useState<boolean>(false)
+  const [nameIndex, setNameIndex] = useState<INameIndexItem[]>([])
 
   /*================================ Functions ==============================*/
   const Reset = useCallback(() => {
@@ -61,6 +69,17 @@ export const ContextAuthProvider: React.FC<FCProps> = ({
     })
   }, [Reset])
 
+  const buildNameIndex = useCallback(() => {
+    const newNameIndex: INameIndexItem[] = []
+    let rawUsers: any = localStorage.getItem('users')
+    if (!rawUsers) rawUsers = '[]'
+    const users = JSON.parse(rawUsers)
+    users.forEach((user) => {
+      newNameIndex.push({ id: user.id, name: user.name })
+    })
+    setNameIndex(newNameIndex)
+  }, [])
+
   /*================================ Effects ==============================*/
   // Hacky-ish, will work for the mock-up
   useEffect(() => {
@@ -72,8 +91,10 @@ export const ContextAuthProvider: React.FC<FCProps> = ({
         getUserData()
         setIsLoaded(true)
       }
+      buildNameIndex()
     }, 25)
-  }, [isLoaded, getUserData])
+  }, [isLoaded, getUserData, buildNameIndex])
+
   /*================================ Memos ==============================*/
   const contextAuthValue: IContextAuth = useMemo(
     () => ({
@@ -82,8 +103,10 @@ export const ContextAuthProvider: React.FC<FCProps> = ({
       isLogged,
       login,
       logout,
+      nameIndex,
+      buildNameIndex,
     }),
-    [isLoaded, user, isLogged, login, logout]
+    [isLoaded, user, isLogged, login, logout, nameIndex, buildNameIndex]
   )
 
   /*================================ Render ==============================*/

@@ -8,6 +8,7 @@ import { apiDelete, apiGet, apiPost, apiPut } from 'utils/api'
 import { useForm, SubmitHandler } from 'react-hook-form'
 import { v4 } from 'uuid'
 import { alertError, alertErrorApi } from 'utils/alerts'
+import { Box, Button, Center, Flex, SimpleGrid, Text, VStack } from '@chakra-ui/react'
 
 interface ICommentSection {
   post_id: number
@@ -20,7 +21,7 @@ interface IRecordCommentEditable extends IRecordComment {
 
 export const CommentSection: React.FC<ICommentSection> = (props) => {
   /*================================ Constants ==============================*/
-  const { isLoaded, isLogged, logout, user } = useContext(ContextAuth)
+  const { isLoaded, isLogged, logout, user, nameIndex } = useContext(ContextAuth)
   const router = useRouter()
   const { comments, post_id, allowPost } = props
   const {
@@ -106,43 +107,66 @@ export const CommentSection: React.FC<ICommentSection> = (props) => {
   /*================================ Render ==============================*/
   if (!props) return <></>
   return (
-    <div>
-      {currentComments.length > 0 &&
-        currentComments.map((comment) => {
-          if (!comment) return <React.Fragment key={v4()}></React.Fragment>
-          return (
-            <div
-              key={`comment-${v4()}`}
-              style={{ border: '1px solid black', padding: '10px', margin: '0 0 10px 0' }}
-            >
-              {/* Todo: for comments to make sense, we need to know who posted... */}
-              user {comment.user_id} says: {comment.content}
-              {user && user.id === comment.user_id && (
-                <div style={{ float: 'right' }}>
-                  <button
-                    onClick={() => {
-                      if (!comment.id) return
-                      reset({ ...comment, contentEdit: comment.content })
-                      setShowEditComment(true)
-                      setShowBlock(false)
-                    }}
-                  >
-                    Edit
-                  </button>
-                  <button
-                    onClick={() => {
-                      if (!comment.id) return
-                      deleteComment({ post_id, comment_id: comment.id })
-                    }}
-                  >
-                    X
-                  </button>
-                </div>
-              )}
-            </div>
-          )
-        })}
+    <Box>
+      {allowPost && !isLogged && !showBlock && (
+        <Flex justify={'center'}>
+          <Button
+            px={10}
+            py={6}
+            background={`#eaeaea`}
+            borderRadius={50}
+            fontWeight={500}
+            onClick={() => {
+              router.push('/login')
+            }}
+          >
+            Entre para comentar 📝
+          </Button>
+        </Flex>
+      )}
 
+      <Flex columnGap={6} flexWrap={'wrap'} alignContent={'center'} justify={'center'} mt={14}>
+        {currentComments.length > 0 &&
+          currentComments.map((comment) => {
+            if (!comment) return <React.Fragment key={v4()}></React.Fragment>
+            return (
+              <Box
+                key={`comment-${v4()}`}
+                border={'1px solid rgba(0,0,0,0.35)'}
+                padding={10}
+                flex={1 / 4}
+                borderRadius={'20px'}
+              >
+                <Text fontWeight={500} opacity={0.8} mt={-3} mb={3}>
+                  {nameIndex.find((e) => e.id === comment.user_id).name}
+                </Text>
+                <Text fontWeight={300}>{comment.content}</Text>
+                {user && user.id === comment.user_id && (
+                  <div style={{ float: 'right' }}>
+                    <button
+                      onClick={() => {
+                        if (!comment.id) return
+                        reset({ ...comment, contentEdit: comment.content })
+                        setShowEditComment(true)
+                        setShowBlock(false)
+                      }}
+                    >
+                      Edit
+                    </button>
+                    <button
+                      onClick={() => {
+                        if (!comment.id) return
+                        deleteComment({ post_id, comment_id: comment.id })
+                      }}
+                    >
+                      X
+                    </button>
+                  </div>
+                )}
+              </Box>
+            )
+          })}
+      </Flex>
       {/*================== CommentNew =================*/}
 
       <div>
@@ -156,17 +180,6 @@ export const CommentSection: React.FC<ICommentSection> = (props) => {
           </button>
         )}
 
-        {allowPost && !isLogged && !showBlock && (
-          <>
-            <button
-              onClick={() => {
-                router.push('/login')
-              }}
-            >
-              Log in to leave a comment
-            </button>
-          </>
-        )}
         {allowPost && isLogged && showBlock && (
           <div style={{ border: '1px solid black', padding: '10px' }}>
             <button
@@ -216,6 +229,6 @@ export const CommentSection: React.FC<ICommentSection> = (props) => {
           </div>
         )}
       </div>
-    </div>
+    </Box>
   )
 }
