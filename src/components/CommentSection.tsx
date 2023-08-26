@@ -3,7 +3,7 @@
 import { ContextAuth } from 'contexts/Auth'
 import { usePathname, useRouter } from 'next/navigation'
 import React, { useCallback, useContext, useEffect, useState } from 'react'
-import { IDeleteComment, IRecordComment } from 'types/api'
+import { IRecordCommentDelete, IRecordComment } from 'types/api'
 import { apiDelete, apiGet, apiPost } from 'utils/api'
 import { useForm, SubmitHandler } from 'react-hook-form'
 import { v4 } from 'uuid'
@@ -35,7 +35,7 @@ export const CommentSection: React.FC<ICommentSection> = (props) => {
     })
   }, [post_id])
   const deleteComment = useCallback(
-    (data: IDeleteComment) => {
+    (data: IRecordCommentDelete) => {
       if (!isLogged) return
       apiDelete('/comments/remove', { post_id: data.post_id, comment_id: data.comment_id }, () => {
         getComments()

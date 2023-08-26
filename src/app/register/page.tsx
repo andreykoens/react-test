@@ -49,12 +49,18 @@ export default function Register() {
           {...register('username', {
             required: 'You must specify a username',
             pattern: { value: usernamePattern, message: 'Please enter a valid username' },
+            maxLength: { value: 191, message: 'The limit is 191 characters' },
           })}
         />
         {errors.password && <p>{errors.password.message}</p>}
         <br />
 
-        <input {...register('name', { required: 'You must specify a name' })} />
+        <input
+          {...register('name', {
+            required: 'You must specify a name',
+            maxLength: { value: 100, message: 'The limit is 100 characters' },
+          })}
+        />
         {errors.password && <p>{errors.password.message}</p>}
         <br />
 
@@ -65,6 +71,7 @@ export default function Register() {
               value: 8,
               message: 'Password must have at least 8 characters',
             },
+            maxLength: { value: 191, message: 'The limit is 191 characters' },
           })}
           type="password"
         />

@@ -12,7 +12,7 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
-      <Script src="fakerApi.js"></Script>
+      <Script src="/fakerApi.js"></Script>
       <body>
         <ContextAuthProvider>
           {/*================== HEADER =================*/}

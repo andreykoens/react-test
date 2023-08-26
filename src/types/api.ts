@@ -40,6 +40,11 @@ export interface IRecordComment {
   content: string
 }
 
+export interface IRecordCommentDelete {
+  post_id: number
+  comment_id: number
+}
+
 export interface IRecordPost {
   id?: number
   user_id?: number
@@ -49,9 +54,6 @@ export interface IRecordPost {
   comments?: IRecordComment[]
 }
 
-/*================================ Comments ==============================*/
-
-export interface IDeleteComment {
+export interface IRecordPostDelete {
   post_id: number
-  comment_id: number
 }

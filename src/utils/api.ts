@@ -49,3 +49,18 @@ export const apiDelete = <K, T>(url: string, props: K, action: Dispatcher<T>) =>
       action({ ...response.data, message: response.message || '' })
     })
 }
+
+export const apiPut = <K, T>(url: string, post_id: string, props: K, action: Dispatcher<T>) => {
+  window.FakerApi.put(url, { post_id, post: props })
+    .catch((err: IResponseError) => {
+      alertError(err)
+    })
+    .then((response: IResponse<T>) => {
+      if (!response) {
+        alertErrorApi()
+        return
+      }
+      // Todo: adding message here to normalize API responses, bad practice
+      action({ ...response.data, message: response.message || '' })
+    })
+}
