@@ -24,9 +24,6 @@ export default function Login() {
   const handleLogin = useCallback(
     (props: ILogin) => {
       login({ username: 'teste', password: 'teste' })
-      /* apiPost('/login', props, (data) => {
-        router.push('/')
-      }) */
     },
     [login]
   )

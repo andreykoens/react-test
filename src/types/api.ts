@@ -48,3 +48,10 @@ export interface IRecordPost {
   message?: string //TODO: remove after api cleanup
   comments?: IRecordComment[]
 }
+
+/*================================ Comments ==============================*/
+
+export interface IDeleteComment {
+  post_id: number
+  comment_id: number
+}

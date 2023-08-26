@@ -2,6 +2,7 @@ import React from 'react'
 import type { Metadata } from 'next'
 import { ContextAuthProvider } from 'contexts/Auth'
 import Script from 'next/script'
+import { Header } from 'components/Header'
 
 export const metadata: Metadata = {
   title: 'React Test',
@@ -13,9 +14,14 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en">
       <Script src="fakerApi.js"></Script>
       <body>
-        <ContextAuthProvider>{children}</ContextAuthProvider>
-        {/*================== FOOTER =================*/}
-        <footer>Written hastily by Andrey Koens, 2023 💖</footer>
+        <ContextAuthProvider>
+          {/*================== HEADER =================*/}
+          <Header />
+          {/*================== BODY =================*/}
+          {children}
+          {/*================== FOOTER =================*/}
+          <footer>Written hastily by Andrey Koens, 2023 💖</footer>
+        </ContextAuthProvider>
       </body>
     </html>
   )
