@@ -22,8 +22,8 @@ export default function Login() {
   /*================================ States ==============================*/
   /*================================ Functions ==============================*/
   const handleLogin = useCallback(
-    (props: ILogin) => {
-      login({ username: 'teste', password: 'teste' })
+    (data: ILogin) => {
+      login(data)
     },
     [login]
   )
