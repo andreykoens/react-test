@@ -3,34 +3,40 @@
 import { ContextAuth } from 'contexts/Auth'
 import { usePathname, useRouter } from 'next/navigation'
 import React, { useCallback, useContext, useEffect, useState } from 'react'
-import { IRecordCommentDelete, IRecordComment } from 'types/api'
-import { apiDelete, apiGet, apiPost } from 'utils/api'
+import { IRecordCommentDelete, IRecordComment, IResponseError, IResponse } from 'types/api'
+import { apiDelete, apiGet, apiPost, apiPut } from 'utils/api'
 import { useForm, SubmitHandler } from 'react-hook-form'
 import { v4 } from 'uuid'
+import { alertError, alertErrorApi } from 'utils/alerts'
 
 interface ICommentSection {
   post_id: number
   comments: IRecordComment[] | undefined
+  allowPost: boolean
+}
+interface IRecordCommentEditable extends IRecordComment {
+  contentEdit: string
 }
 
 export const CommentSection: React.FC<ICommentSection> = (props) => {
   /*================================ Constants ==============================*/
   const { isLoaded, isLogged, logout, user } = useContext(ContextAuth)
   const router = useRouter()
-  const { comments, post_id } = props
+  const { comments, post_id, allowPost } = props
   const {
     register,
     formState: { errors },
     reset,
     handleSubmit,
-  } = useForm<IRecordComment>()
+  } = useForm<IRecordCommentEditable>()
 
   /*================================ States ==============================*/
-  const [currentComments, setCurrentComments] = useState<IRecordComment[]>([])
+  const [currentComments, setCurrentComments] = useState<IRecordCommentEditable[]>([])
   const [showBlock, setShowBlock] = useState<boolean>(false)
+  const [showEditComment, setShowEditComment] = useState<boolean>(false)
   /*================================ Functions ==============================*/
   const getComments = useCallback(() => {
-    apiGet('/comments', { post_id }, (data: IRecordComment[]) => {
+    apiGet('/comments', { post_id }, (data: IRecordCommentEditable[]) => {
       setCurrentComments(Object.values(data))
     })
   }, [post_id])
@@ -43,8 +49,30 @@ export const CommentSection: React.FC<ICommentSection> = (props) => {
     },
     [getComments, isLogged]
   )
+  const putComment = useCallback(
+    (id: number, data: IRecordCommentEditable) => {
+      if (!isLogged) return
+      window.FakerApi.put('/comments/update', {
+        post_id: post_id,
+        comment_id: id,
+        comment: data,
+      })
+        .catch((err: IResponseError) => {
+          alertError(err)
+        })
+        .then((response: IResponse<IRecordCommentEditable>) => {
+          if (!response) {
+            alertErrorApi()
+            return
+          }
+          getComments()
+          reset()
+        })
+    },
+    [getComments, isLogged, post_id, reset]
+  )
   const postComment = useCallback(
-    (data: IRecordComment) => {
+    (data: IRecordCommentEditable) => {
       if (!isLogged) return
       apiPost(
         '/comments/create',
@@ -61,8 +89,14 @@ export const CommentSection: React.FC<ICommentSection> = (props) => {
     [getComments, isLogged, post_id, reset]
   )
 
-  const onSubmit: SubmitHandler<any> = (data) => {
+  const onSubmitNew: SubmitHandler<any> = (data) => {
     postComment(data)
+  }
+  const onSubmitEdit: SubmitHandler<any> = (data) => {
+    data.content = data.contentEdit
+    putComment(data.id, data)
+    setShowEditComment(false)
+    reset()
   }
   /*================================ Effects ==============================*/
   useEffect(() => {
@@ -78,25 +112,38 @@ export const CommentSection: React.FC<ICommentSection> = (props) => {
           if (!comment) return <React.Fragment key={v4()}></React.Fragment>
           return (
             <p key={`comment-${v4()}`} style={{ border: '1px solid black', padding: '10px' }}>
+              {/* Todo: for comments to make sense, we need to know who posted... */}
               user {comment.user_id} says: {comment.content}
               {user && user.id === comment.user_id && (
-                <button
-                  onClick={() => {
-                    if (!comment.id) return
-                    deleteComment({ post_id, comment_id: comment.id })
-                  }}
-                  style={{ float: 'right' }}
-                >
-                  X
-                </button>
+                <div style={{ float: 'right' }}>
+                  <button
+                    onClick={() => {
+                      if (!comment.id) return
+                      reset({ ...comment, contentEdit: comment.content })
+                      setShowEditComment(true)
+                      setShowBlock(false)
+                    }}
+                  >
+                    Edit
+                  </button>
+                  <button
+                    onClick={() => {
+                      if (!comment.id) return
+                      deleteComment({ post_id, comment_id: comment.id })
+                    }}
+                  >
+                    X
+                  </button>
+                </div>
               )}
             </p>
           )
         })}
 
       {/*================== CommentNew =================*/}
+
       <div>
-        {isLogged && !showBlock && (
+        {allowPost && isLogged && !showBlock && !showEditComment && (
           <button
             onClick={() => {
               setShowBlock((current) => !current)
@@ -106,7 +153,7 @@ export const CommentSection: React.FC<ICommentSection> = (props) => {
           </button>
         )}
 
-        {!isLogged && !showBlock && (
+        {allowPost && !isLogged && !showBlock && (
           <>
             <h3>You need to be logged in to leave a comment.</h3>
             <button
@@ -118,7 +165,7 @@ export const CommentSection: React.FC<ICommentSection> = (props) => {
             </button>
           </>
         )}
-        {isLogged && showBlock && (
+        {allowPost && isLogged && showBlock && (
           <div style={{ border: '1px solid black', padding: '10px' }}>
             <button
               onClick={() => {
@@ -134,7 +181,47 @@ export const CommentSection: React.FC<ICommentSection> = (props) => {
               <input {...register('content', { required: "You can't leave an empty comment" })} />
               {errors.content && <p>{errors.content.message}</p>}
               <br />
-              <input type="submit" onClick={handleSubmit(onSubmit)} />
+              <input type="submit" onClick={handleSubmit(onSubmitNew)} />
+            </form>
+          </div>
+        )}
+      </div>
+
+      {/*================== CommentEdit =================*/}
+
+      <div>
+        {!isLogged && !showEditComment && (
+          <>
+            <h3>You need to be logged in to edit a comment.</h3>
+            <button
+              onClick={() => {
+                router.push('/login')
+              }}
+            >
+              Login
+            </button>
+          </>
+        )}
+        {isLogged && showEditComment && (
+          <div style={{ border: '1px solid black', padding: '10px' }}>
+            <button
+              onClick={() => {
+                setShowEditComment(false)
+                reset()
+              }}
+              style={{ float: 'right' }}
+            >
+              Cancel
+            </button>
+
+            <h3>Edit comment</h3>
+            <form onSubmit={(e) => e.preventDefault()}>
+              <input
+                {...register('contentEdit', { required: "You can't leave an empty comment" })}
+              />
+              {errors.content && <p>{errors.content.message}</p>}
+              <br />
+              <input type="submit" onClick={handleSubmit(onSubmitEdit)} />
             </form>
           </div>
         )}

@@ -22,6 +22,7 @@ export const Header: React.FC = ({}) => {
         SetValueBuscaPost(response)
       })
   }, [])
+
   /*================================ Effects ==============================*/
   /*================================ Render ==============================*/
   return (
@@ -40,6 +41,24 @@ export const Header: React.FC = ({}) => {
             >
               Dashboard
             </button>
+          )}
+          {pathname.includes('dashboard') && (
+            <span>
+              <button
+                onClick={() => {
+                  router.push('/dashboard/posts/list')
+                }}
+              >
+                View Posts
+              </button>
+              <button
+                onClick={() => {
+                  router.push('/dashboard/comments')
+                }}
+              >
+                View Comments
+              </button>
+            </span>
           )}
           <button
             onClick={() => {

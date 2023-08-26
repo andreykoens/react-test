@@ -3,7 +3,7 @@
 import React, { useCallback, useContext, useEffect, useState } from 'react'
 import { ContextAuth } from 'contexts/Auth'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
+import { useParams, useRouter } from 'next/navigation'
 import { apiGet } from 'utils/api'
 import { IRecordPost } from 'types/api'
 import { v4 } from 'uuid'
@@ -13,6 +13,7 @@ export default function RecordsShowPost() {
   /*================================ Constants ==============================*/
   const { isLoaded, isLogged, logout, user } = useContext(ContextAuth)
   const router = useRouter()
+  const params = useParams()
   /*================================ States ==============================*/
   const [valueBuscaPost, SetValueBuscaPost] = useState<any>(null)
   const [recordPost, setRecordPost] = useState<any>(null)
@@ -55,10 +56,14 @@ export default function RecordsShowPost() {
   }, [])
 
   const getPost = useCallback(() => {
-    apiGet<{ post_id: number }, IRecordPost>('/posts/view', { post_id: 1 }, (data: IRecordPost) => {
-      setRecordPost(data)
-    })
-  }, [])
+    apiGet<{ post_id: number }, IRecordPost>(
+      '/posts/view',
+      { post_id: Number(params.id) },
+      (data: IRecordPost) => {
+        setRecordPost(data)
+      }
+    )
+  }, [params.id])
   /*================================ Effects ==============================*/
   useEffect(() => {
     if (!isLoaded) return
@@ -81,7 +86,11 @@ export default function RecordsShowPost() {
           <small>Written by {recordPost.user_id}</small>
           <p>{recordPost.content}</p>
           {recordPost.id && (
-            <CommentSection post_id={recordPost.id} comments={recordPost.comments}></CommentSection>
+            <CommentSection
+              post_id={recordPost.id}
+              comments={recordPost.comments}
+              allowPost={true}
+            ></CommentSection>
           )}
         </div>
       )}

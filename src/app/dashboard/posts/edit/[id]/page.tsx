@@ -45,10 +45,12 @@ export default function DashboardPostsUpdate() {
   /*================================ Effects ==============================*/
   useEffect(() => {
     if (!isLoaded) return
-    if (isLoaded && !isLogged) {
-      // router.push('/')
-    }
-    getPost()
+    setTimeout(() => {
+      if (isLoaded && !isLogged) {
+        router.push('/')
+      }
+      getPost()
+    }, 50)
   }, [getPost, isLoaded, isLogged, router])
   /*================================ Memos ==============================*/
   /*================================ Render ==============================*/
