@@ -65,7 +65,7 @@ export default function DashboardCommentsList() {
             <h2>
               <Link href={`/dashboard/posts/edit/${post.id}`}>{post.title}</Link>
             </h2>
-            <p>{post.content.substring(0, 100)}...</p>
+            <p>{post.content && post.content.substring(0, 100)}...</p>
             {post && post.id && post.comments && (
               <CommentSection
                 post_id={post.id}

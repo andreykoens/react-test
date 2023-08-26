@@ -4,6 +4,7 @@ import { ContextAuth } from 'contexts/Auth'
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import React, { useCallback, useContext, useState } from 'react'
+import { Nuke, Seed } from 'utils/seeder'
 
 export const Header: React.FC = ({}) => {
   /*================================ Constants ==============================*/
@@ -29,6 +30,21 @@ export const Header: React.FC = ({}) => {
     <div>
       <h1>
         <Link href={'/'}>React Test</Link>
+        <button
+          onClick={() => {
+            Seed()
+          }}
+        >
+          Seed
+        </button>
+        <button
+          onClick={() => {
+            logout()
+            Nuke()
+          }}
+        >
+          Nuke
+        </button>
       </h1>
       {isLogged && (
         <div>

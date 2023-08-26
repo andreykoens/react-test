@@ -8,6 +8,7 @@ import { apiPost } from 'utils/api'
 import { IRecordPost } from 'types/api'
 import { CommentSection } from 'components/CommentSection'
 import { v4 } from 'uuid'
+import { EmptyList } from 'components/EmptyList'
 
 export default function Home() {
   /*================================ Constants ==============================*/
@@ -47,10 +48,15 @@ export default function Home() {
             <small>Written by {post.user_id}</small>
             <p>{post.content}</p>
             {post.id && (
-              <CommentSection comments={post.comments} post_id={post.id}></CommentSection>
+              <CommentSection
+                comments={post.comments}
+                post_id={post.id}
+                allowPost={true}
+              ></CommentSection>
             )}
           </div>
         ))}
+      {recordsPosts && recordsPosts.length === 0 && <EmptyList></EmptyList>}
     </main>
   )
 }

@@ -63,7 +63,7 @@ export default function DashboardPostsList() {
             <h2>
               <Link href={`/dashboard/posts/edit/${post.id}`}>{post.title}</Link>
             </h2>
-            <p>{post.content.substring(0, 100)}...</p>
+            <p>{post.content && post.content.substring(0, 100)}...</p>
             <button
               onClick={() => {
                 deletePost({ post_id: post.id })

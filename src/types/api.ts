@@ -25,24 +25,13 @@ export interface IRegister {
   passwordconfirm?: string
 }
 
-export interface IUser {
-  name: string
-  username: string
-  password: string //TODO: Maybe not a good idea, bad security
-  id: number
-}
-
 /*================================ Records ==============================*/
 
-export interface IRecordComment {
-  id?: number
-  user_id?: number
-  content: string
-}
-
-export interface IRecordCommentDelete {
-  post_id: number
-  comment_id: number
+export interface IRecordUser {
+  name: string
+  username: string
+  password: string
+  id: number
 }
 
 export interface IRecordPost {
@@ -56,4 +45,15 @@ export interface IRecordPost {
 
 export interface IRecordPostDelete {
   post_id: number
+}
+
+export interface IRecordComment {
+  id?: number
+  user_id?: number
+  content: string
+}
+
+export interface IRecordCommentDelete {
+  post_id: number
+  comment_id: number
 }

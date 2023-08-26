@@ -111,7 +111,10 @@ export const CommentSection: React.FC<ICommentSection> = (props) => {
         currentComments.map((comment) => {
           if (!comment) return <React.Fragment key={v4()}></React.Fragment>
           return (
-            <p key={`comment-${v4()}`} style={{ border: '1px solid black', padding: '10px' }}>
+            <div
+              key={`comment-${v4()}`}
+              style={{ border: '1px solid black', padding: '10px', margin: '0 0 10px 0' }}
+            >
               {/* Todo: for comments to make sense, we need to know who posted... */}
               user {comment.user_id} says: {comment.content}
               {user && user.id === comment.user_id && (
@@ -136,7 +139,7 @@ export const CommentSection: React.FC<ICommentSection> = (props) => {
                   </button>
                 </div>
               )}
-            </p>
+            </div>
           )
         })}
 
@@ -155,13 +158,12 @@ export const CommentSection: React.FC<ICommentSection> = (props) => {
 
         {allowPost && !isLogged && !showBlock && (
           <>
-            <h3>You need to be logged in to leave a comment.</h3>
             <button
               onClick={() => {
                 router.push('/login')
               }}
             >
-              Login
+              Log in to leave a comment
             </button>
           </>
         )}
@@ -190,18 +192,6 @@ export const CommentSection: React.FC<ICommentSection> = (props) => {
       {/*================== CommentEdit =================*/}
 
       <div>
-        {!isLogged && !showEditComment && (
-          <>
-            <h3>You need to be logged in to edit a comment.</h3>
-            <button
-              onClick={() => {
-                router.push('/login')
-              }}
-            >
-              Login
-            </button>
-          </>
-        )}
         {isLogged && showEditComment && (
           <div style={{ border: '1px solid black', padding: '10px' }}>
             <button
