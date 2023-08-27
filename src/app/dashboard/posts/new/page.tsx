@@ -6,6 +6,16 @@ import { apiPost } from 'utils/api'
 import { IRecordPost, IRegister } from 'types/api'
 import { useRouter } from 'next/navigation'
 import { useForm, SubmitHandler } from 'react-hook-form'
+import {
+  Box,
+  Button,
+  Flex,
+  FormControl,
+  FormErrorMessage,
+  Input,
+  Textarea,
+  VStack,
+} from '@chakra-ui/react'
 
 export default function Register() {
   /*================================ Constants ==============================*/
@@ -43,28 +53,53 @@ export default function Register() {
   /*================================ Memos ==============================*/
   /*================================ Render ==============================*/
   return (
-    <main>
-      <form onSubmit={(e) => e.preventDefault()}>
-        <input
-          {...register('title', {
-            required: 'You must write a title',
-            minLength: { value: 15, message: 'You must provide at least 15 characters' },
-            maxLength: { value: 60, message: 'The title limit is 60 characters' },
-          })}
-        />
-        {errors.title && <p>{errors.title.message}</p>}
-        <br />
-        <textarea
-          {...register('content', {
-            required: 'You must write some content',
-            minLength: { value: 260, message: 'You must provide at least 256 characters' },
-          })}
-        />
-        {errors.content && <p>{errors.content.message}</p>}
-        <br />
+    <Flex
+      id={'RegisterPostNew'}
+      h={'100%'}
+      w={'100%'}
+      flexDirection={'column'}
+      justify={'center'}
+      align={'center'}
+    >
+      <form onSubmit={(e) => e.preventDefault()} style={{ maxWidth: '700px', width: '100%' }}>
+        <VStack gap={6} h={'100%'} maxW={'700px'} w={'100%'} margin={'0 auto'}>
+          <FormControl isInvalid={errors.title}>
+            <Input
+              size={'lg'}
+              placeholder="Título da postagem"
+              {...register('title', {
+                required: 'O título é obrigatório',
+                minLength: { value: 15, message: 'Você precisa utilizar pelo menos 15 caracteres' },
+                maxLength: { value: 60, message: 'O limite de 60 caracteres foi excedido' },
+              })}
+            />
+            <FormErrorMessage>{errors.title && errors.title.message}</FormErrorMessage>
+          </FormControl>
 
-        <input type="submit" onClick={handleSubmit(onSubmit)} />
+          <FormControl isInvalid={errors.content} flexGrow={1}>
+            <Textarea
+              h={'100%'}
+              size={'lg'}
+              placeholder="Conteúdo"
+              rows={10}
+              {...register('content', {
+                required: 'Você precisa incluir o conteúdo',
+                minLength: {
+                  value: 260,
+                  message: 'Você precisa utilizar pelo menos 250 caracteres',
+                },
+              })}
+            />
+            <FormErrorMessage>{errors.content && errors.content.message}</FormErrorMessage>
+          </FormControl>
+          <Box textAlign={'right'} w={'100%'}>
+            <Button type="submit" onClick={handleSubmit(onSubmit)}>
+              Postar
+            </Button>
+          </Box>
+        </VStack>
+        <br />
       </form>
-    </main>
+    </Flex>
   )
 }

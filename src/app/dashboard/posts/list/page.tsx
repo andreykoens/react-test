@@ -2,11 +2,22 @@
 
 import React, { useCallback, useContext, useEffect, useState } from 'react'
 import { ContextAuth } from 'contexts/Auth'
-import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { apiDelete, apiPost } from 'utils/api'
 import { IRecordPost, IRecordPostDelete } from 'types/api'
 import { v4 } from 'uuid'
+import {
+  Box,
+  Button,
+  Flex,
+  HStack,
+  Heading,
+  Link,
+  SimpleGrid,
+  Text,
+  VStack,
+} from '@chakra-ui/react'
+import { EmptyList } from 'components/EmptyList'
 
 export default function DashboardPostsList() {
   /*================================ Constants ==============================*/
@@ -46,33 +57,50 @@ export default function DashboardPostsList() {
 
   /*================================ Memos ==============================*/
   /*================================ Render ==============================*/
+
+  if (recordsPosts && recordsPosts.length === 0) return
+  ;<Flex flexGrow={1} justify={'center'} alignItems={'center'} flexDirection={'column'} h={'100%'}>
+    <EmptyList></EmptyList>
+  </Flex>
   return (
-    <main>
+    <SimpleGrid columns={2} gap={10} flexGrow={1} h={'100%'} pt={0}>
       {/*================== POSTS =================*/}
-      {recordsPosts && recordsPosts.length === 0 && (
-        <div>
-          No posts yet. <Link href={'/dashboard/posts/new'}>Start now</Link>
-        </div>
-      )}
+      {recordsPosts && recordsPosts.length === 0 && <EmptyList></EmptyList>}
       {recordsPosts &&
         recordsPosts.map((post: IRecordPost) => (
-          <div
+          <HStack
             key={`post-${v4()}`}
-            style={{ border: '1px solid black', padding: '10px', margin: '0 0 10px 0' }}
+            w={'full'}
+            bg={'#f6f6f6'}
+            borderRadius={30}
+            p={10}
+            align={'flex-start'}
           >
-            <h2>
-              <Link href={`/dashboard/posts/edit/${post.id}`}>{post.title}</Link>
-            </h2>
-            <p>{post.content && post.content.substring(0, 100)}...</p>
-            <button
-              onClick={() => {
-                deletePost({ post_id: post.id })
-              }}
-            >
-              X
-            </button>
-          </div>
+            <Box>
+              <Heading mb={5}>
+                <Link href={`/dashboard/posts/edit/${post.id}`}>{post.title}</Link>
+              </Heading>
+              <Text>{post.content && post.content.substring(0, 100)}...</Text>
+            </Box>
+            <Box width={'80px'}>
+              <Button
+                mb={6}
+                onClick={() => {
+                  router.push(`/dashboard/posts/edit/${post.id}`)
+                }}
+              >
+                Editar
+              </Button>
+              <Button
+                onClick={() => {
+                  deletePost({ post_id: post.id })
+                }}
+              >
+                Excluir
+              </Button>
+            </Box>
+          </HStack>
         ))}
-    </main>
+    </SimpleGrid>
   )
 }

@@ -103,7 +103,7 @@ export const Header: React.FC = ({}) => {
           <Popover placement={'bottom-start'}>
             <PopoverTrigger>
               <Button variant={'unstyled'} fontSize={30} _hover={{ opacity: 0.6 }}>
-                Andrey Koens
+                {!isLogged ? 'Andrey Koens' : 'AK'}
               </Button>
             </PopoverTrigger>
             <PopoverContent borderRadius={20} w={'500px'}>
@@ -136,24 +136,7 @@ export const Header: React.FC = ({}) => {
                   Dashboard
                 </Button>
               )}
-              {pathname.includes('dashboard') && (
-                <span>
-                  <Button
-                    onClick={() => {
-                      router.push('/dashboard/posts/list')
-                    }}
-                  >
-                    Ver Posts
-                  </Button>
-                  <Button
-                    onClick={() => {
-                      router.push('/dashboard/comments')
-                    }}
-                  >
-                    Ver Comentários
-                  </Button>
-                </span>
-              )}
+
               <Button
                 onClick={() => {
                   logout()

@@ -1,8 +1,7 @@
 'use client'
 
-import { Box, Button, Heading } from '@chakra-ui/react'
+import { Box, Button, Link, Heading } from '@chakra-ui/react'
 import { ContextAuth, useAuth } from 'contexts/Auth'
-import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import React, { useCallback, useContext, useState } from 'react'
 import { Seed } from 'utils/seeder'
@@ -26,7 +25,11 @@ export const EmptyList: React.FC = ({}) => {
           )}
           {isLogged && (
             <Heading fontWeight={300}>
-              Nenhum post. Que tal <Link href={'/dashboard/posts/new'}>criar</Link> um novo?
+              Nenhum post. Que tal{' '}
+              <Link href={'/dashboard/posts/new'} opacity={0.85}>
+                criar um novo
+              </Link>
+              ?
             </Heading>
           )}
           <Button
@@ -35,6 +38,9 @@ export const EmptyList: React.FC = ({}) => {
             borderBottom={'1px solid black'}
             px={3}
             _hover={{ background: '#f6f6f6' }}
+            onClick={() => {
+              Seed()
+            }}
           >
             Quer ir direto pro blá blá blá? Você pode usar um seed.
           </Button>

@@ -83,6 +83,11 @@ export const ContextAuthProvider: React.FC<FCProps> = ({
   /*================================ Effects ==============================*/
   // Hacky-ish, will work for the mock-up
   useEffect(() => {
+    if (!isLogged) {
+      const authCheck = localStorage.getItem('auth')
+      const check = JSON.parse(authCheck)
+      if (check && 'name' in check) setIsLogged(true)
+    }
     if (isLoaded) return
     setTimeout(() => {
       if (!window.FakerApi) {
@@ -93,7 +98,7 @@ export const ContextAuthProvider: React.FC<FCProps> = ({
       }
       buildNameIndex()
     }, 25)
-  }, [isLoaded, getUserData, buildNameIndex])
+  }, [isLoaded, getUserData, buildNameIndex, isLogged])
 
   /*================================ Memos ==============================*/
   const contextAuthValue: IContextAuth = useMemo(
