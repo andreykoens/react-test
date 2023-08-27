@@ -1,15 +1,7 @@
 import { Faker, pt_BR } from '@faker-js/faker'
 import { IRecordComment, IRecordPost, IRecordUser } from 'types/api'
-// const handleMakeComment = () => {
-//   window.FakerApi.post('/comments/create', {
-//     post_id: availablePostIds[Math.floor(Math.random() * availablePostIds.length)],
-//     comment: {
-//       content: faker.lorem.sentence({ min: 8, max: 30 }),
-//     },
-//   }).then((data) => {
-//     setAmountComments((c) => c - 1)
-//   })
-// }
+import { emojifyBetweenWords, emojifySentence } from './emojiBank'
+import { getRandomFloat } from './math'
 
 const faker = new Faker({
   locale: [pt_BR],
@@ -22,40 +14,6 @@ interface IDestroyQueueItem {
 interface ISeedComment {
   post_id: number
   comment: IRecordComment
-}
-
-const recursiveSeed = (posts: number, comments: number, postIds: Array<number>) => {
-  if (posts <= 0 && postIds.length <= 0) {
-    window.FakerApi.get('/posts', {}).then((response: any) => {
-      const currentPosts = response.data
-      const postIds: number[] = currentPosts.map((p: any) => {
-        return p.id
-      })
-      recursiveSeed(posts, comments, postIds)
-    })
-    return
-  }
-  if (posts <= 0 && postIds.length > 0) {
-    shift = 'comments'
-    path = '/comments/create'
-    item = {
-      post_id: postIds[Math.floor(Math.random() * postIds.length)],
-      comment: {
-        content: faker.lorem.sentence({ min: 8, max: 30 }),
-      },
-    }
-  }
-  if (posts <= 0 && comments <= 0) window.location = window.location
-  window.FakerApi.post(path, item)
-    .catch((e) => {
-      console.log(e)
-    })
-    .then((data: any) => {
-      console.log('Seeding, ', posts, ' posts, ', comments, ' comments left')
-      if (shift === 'posts') posts--
-      if (shift === 'comments') comments--
-      recursiveSeed(posts, comments, postIds)
-    })
 }
 
 export const Seed = () => {
@@ -100,11 +58,20 @@ export const Seed = () => {
   if (!rawPosts) rawPosts = '[]'
   const posts: IRecordPost[] = JSON.parse(rawPosts)
   for (let i = 0; i <= amountPosts; i++) {
+    let contentBase = faker.lorem.paragraphs({ min: 10, max: 30 })
+    let contentSplits = contentBase.split('\n')
+    contentBase = contentSplits[0]
+    for (let i = 0; i < contentSplits.length; i++) {
+      contentSplits.shift()
+      const separator = getRandomFloat(0, 1) > 0.7 ? '\n' : ' '
+      contentBase += separator + contentSplits[0]
+    }
+    let content = emojifyBetweenWords(contentBase)
     posts.push({
       id: Number(nextPostId),
       user_id: users[Math.floor(Math.random() * users.length)].id,
       title: faker.lorem.words({ min: 2, max: 5 }),
-      content: faker.lorem.text(),
+      content,
       comments: [],
     })
     nextPostId++
@@ -119,7 +86,7 @@ export const Seed = () => {
       posts[postId].comments.push({
         id: Number(nextCommentId),
         user_id: users[Math.floor(Math.random() * users.length)].id,
-        content: faker.lorem.sentence({ min: 8, max: 30 }),
+        content: emojifySentence(faker.lorem.sentence({ min: 8, max: 20 })),
       })
     }
     nextCommentId++
@@ -145,19 +112,7 @@ export const Nuke = () => {
   localStorage.setItem('nextPostId', '0')
   localStorage.setItem('nextCommentId', '0')
   localStorage.setItem('auth', '')
+
+  //reload page
   window.location = window.location
-  /* let tComments: IDestroyQueueItem[] = []
-  let tPosts: IDestroyQueueItem[] = []
-  window.FakerApi.get('/posts', {}).then((response: any) => {
-    const currentPosts = response.data
-    currentPosts.forEach((p: any) => {
-      if (p.comments && p.comments.length > 0) {
-        Object.values(p.comments).forEach((c: any) => {
-          tComments.push({ post_id: p.id, comment_id: c.id })
-        })
-      }
-      tPosts.push({ post_id: p.id })
-    })
-    recursiveDelete(tComments, tPosts)
-  }) */
 }

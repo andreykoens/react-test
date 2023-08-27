@@ -6,7 +6,7 @@ import { ContextAuthProvider } from 'contexts/Auth'
 import Script from 'next/script'
 import { Header } from 'components/Header'
 import { CacheProvider } from '@chakra-ui/next-js'
-import { Box, ChakraProvider, Flex } from '@chakra-ui/react'
+import { Box, ChakraProvider, Flex, Spacer } from '@chakra-ui/react'
 import { theme } from 'styles/theme'
 
 import '@fontsource/poppins/200.css'
@@ -14,6 +14,8 @@ import '@fontsource/poppins/300.css'
 import '@fontsource/poppins/500.css'
 import '@fontsource/poppins/600.css'
 import { Footer } from 'components/Footer'
+import { ContextMouseEvents, ContextMouseEventsProvider } from 'contexts/MouseEvent'
+import { Presentation } from 'components/Presentation'
 
 export const metadata: Metadata = {
   title: 'React Test',
@@ -36,16 +38,27 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <Script src="/fakerApi.js"></Script>
       <body>
         <Providers>
-          <Box minH={'100vh'} background={'#fdfdfd'}>
-            {/*================== HEADER =================*/}
+          <Flex
+            id={'LayoutWrap'}
+            pt={150}
+            minH={'100vh'}
+            direction={'column'}
+            background={'#fdfdfd'}
+          >
             <Header></Header>
-            {/*================== BODY =================*/}
-            <Flex justify={'center'}>
-              <Box maxW={'1200px'}>{children}</Box>
+            <Flex
+              id={'ContentWrap'}
+              flexGrow={1}
+              flexDir={'column'}
+              alignContent={'center'}
+              justifyContent={'center'}
+              zIndex={10}
+              position={'relative'}
+            >
+              {children}
             </Flex>
-            {/*================== FOOTER =================*/}
             <Footer></Footer>
-          </Box>
+          </Flex>
         </Providers>
       </body>
     </html>

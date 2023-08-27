@@ -8,7 +8,9 @@ import { apiDelete, apiGet, apiPost, apiPut } from 'utils/api'
 import { useForm, SubmitHandler } from 'react-hook-form'
 import { v4 } from 'uuid'
 import { alertError, alertErrorApi } from 'utils/alerts'
-import { Box, Button, Center, Flex, SimpleGrid, Text, VStack } from '@chakra-ui/react'
+import { Box, Button, Center, Flex, SimpleGrid, Text, VStack, keyframes } from '@chakra-ui/react'
+import { getRandomBoolean, getRandomFloat, getRandomInt } from 'utils/math'
+import { RecordCommentShow } from './RecordCommentShow'
 
 interface ICommentSection {
   post_id: number
@@ -125,48 +127,30 @@ export const CommentSection: React.FC<ICommentSection> = (props) => {
         </Flex>
       )}
 
-      <Flex columnGap={6} flexWrap={'wrap'} alignContent={'center'} justify={'center'} mt={14}>
+      <Box mt={10}>
         {currentComments.length > 0 &&
           currentComments.map((comment) => {
             if (!comment) return <React.Fragment key={v4()}></React.Fragment>
             return (
-              <Box
+              <RecordCommentShow
                 key={`comment-${v4()}`}
-                border={'1px solid rgba(0,0,0,0.35)'}
-                padding={10}
-                flex={1 / 4}
-                borderRadius={'20px'}
-              >
-                <Text fontWeight={500} opacity={0.8} mt={-3} mb={3}>
-                  {nameIndex.find((e) => e.id === comment.user_id).name}
-                </Text>
-                <Text fontWeight={300}>{comment.content}</Text>
-                {user && user.id === comment.user_id && (
-                  <div style={{ float: 'right' }}>
-                    <button
-                      onClick={() => {
-                        if (!comment.id) return
-                        reset({ ...comment, contentEdit: comment.content })
-                        setShowEditComment(true)
-                        setShowBlock(false)
-                      }}
-                    >
-                      Edit
-                    </button>
-                    <button
-                      onClick={() => {
-                        if (!comment.id) return
-                        deleteComment({ post_id, comment_id: comment.id })
-                      }}
-                    >
-                      X
-                    </button>
-                  </div>
-                )}
-              </Box>
+                {...{
+                  Record: comment,
+                  EditAction: () => {
+                    if (!comment.id) return
+                    reset({ ...comment, contentEdit: comment.content })
+                    setShowEditComment(true)
+                    setShowBlock(false)
+                  },
+                  DeleteAction: () => {
+                    if (!comment.id) return
+                    deleteComment({ post_id, comment_id: comment.id })
+                  },
+                }}
+              ></RecordCommentShow>
             )
           })}
-      </Flex>
+      </Box>
       {/*================== CommentNew =================*/}
 
       <div>
@@ -204,7 +188,7 @@ export const CommentSection: React.FC<ICommentSection> = (props) => {
 
       {/*================== CommentEdit =================*/}
 
-      <div>
+      <Box>
         {isLogged && showEditComment && (
           <div style={{ border: '1px solid black', padding: '10px' }}>
             <button
@@ -228,7 +212,7 @@ export const CommentSection: React.FC<ICommentSection> = (props) => {
             </form>
           </div>
         )}
-      </div>
+      </Box>
     </Box>
   )
 }
