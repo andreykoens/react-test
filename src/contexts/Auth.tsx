@@ -2,7 +2,7 @@
 
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import { ILogin, IRecordUser } from 'types/api'
-import { apiPost } from 'utils/api'
+import { useApi } from './Api'
 
 declare global {
   interface Window {
@@ -41,6 +41,7 @@ export const ContextAuthProvider: React.FC<FCProps> = ({
   children: React.ReactNode
 }) => {
   /*================================ Constants ==============================*/
+  const { apiGet, apiPost } = useApi()
   /*================================ States ==============================*/
   const [user, setUser] = useState<IRecordUser>()
   const [isLogged, setIsLogged] = useState<boolean>(false)
@@ -53,25 +54,27 @@ export const ContextAuthProvider: React.FC<FCProps> = ({
     setIsLogged(false)
   }, [])
   const getUserData = useCallback(() => {
-    apiPost('/me', {}, (data: IRecordUser) => {
+    apiGet<unknown, IRecordUser>('/me', {}, (data) => {
       setUser(data)
       setIsLogged(true)
     })
-  }, [])
+  }, [apiGet])
+
   const login = useCallback(
     (props: ILogin) => {
-      apiPost<ILogin, ILogin>('/login', props, () => {
+      apiPost('/login', props, () => {
         getUserData()
       })
     },
-    [getUserData]
+    [apiPost, getUserData]
   )
+
   const logout = useCallback(() => {
     apiPost('/logout', {}, () => {
       setIsLogged(false)
       Reset()
     })
-  }, [Reset])
+  }, [Reset, apiPost])
 
   const buildNameIndex = useCallback(() => {
     const newNameIndex: INameIndexItem[] = []
@@ -89,21 +92,17 @@ export const ContextAuthProvider: React.FC<FCProps> = ({
   useEffect(() => {
     if (!isLogged) {
       const authCheck: string = localStorage.getItem('auth')
-      if (authCheck) {
-        const check = JSON.parse(authCheck)
-        if (check && 'name' in check) setIsLogged(true)
+      if (authCheck && authCheck.length > 0) {
+        setIsLogged(true)
       }
     }
     if (isLoaded) return
-    setTimeout(() => {
-      if (!window.FakerApi) {
-        setIsLoaded(false)
-      } else {
-        getUserData()
-        setIsLoaded(true)
-      }
-      buildNameIndex()
-    }, 25)
+    if (!window.FakerApi) {
+      setIsLoaded(false)
+      return
+    }
+    buildNameIndex()
+    setIsLoaded(true)
   }, [isLoaded, getUserData, buildNameIndex, isLogged])
 
   /*================================ Memos ==============================*/

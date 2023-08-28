@@ -2,28 +2,29 @@
 
 import React, { useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import { ContextAuth } from 'contexts/Auth'
-import { apiPost } from 'utils/api'
+
 import { IRecordPost } from 'types/api'
 import { v4 } from 'uuid'
 import { Heading, Text, VStack } from '@chakra-ui/react'
 import { randomDrift } from 'styles/theme'
 import { RecordPostShow } from 'components/RecordPostShow'
 import { Presentation } from 'components/Presentation'
+import { useApi } from 'contexts/Api'
 
 export default function Home() {
   /*================================ Constants ==============================*/
   const { isLoaded } = useContext(ContextAuth)
+  const { apiGet } = useApi()
 
   /*================================ States ==============================*/
   const [recordsPosts, setRecordsPosts] = useState<IRecordPost[]>([])
 
   /*================================ Functions ==============================*/
   const getPosts = useCallback(() => {
-    apiPost('/posts', {}, (data: Record<string | number, IRecordPost>) => {
-      delete data['message']
+    apiGet<unknown, Record<string | number, IRecordPost>>('/posts', {}, (data) => {
       setRecordsPosts(Object.values(data))
     })
-  }, [])
+  }, [apiGet])
   const EndOfRecords = useMemo(() => {
     return 'tinha, e agora acabou'.split('').map((letter) => (
       <Text

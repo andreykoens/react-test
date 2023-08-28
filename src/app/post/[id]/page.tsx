@@ -3,16 +3,18 @@
 import React, { useCallback, useContext, useEffect, useState } from 'react'
 import { ContextAuth } from 'contexts/Auth'
 import { useParams } from 'next/navigation'
-import { apiGet } from 'utils/api'
+
 import { IRecordPost } from 'types/api'
 import { v4 } from 'uuid'
 import { VStack } from '@chakra-ui/react'
 import { RecordPostShow } from 'components/RecordPostShow'
+import { useApi } from 'contexts/Api'
 
 export default function RecordsShowPost() {
   /*================================ Constants ==============================*/
   const { isLoaded } = useContext(ContextAuth)
   const params = useParams()
+  const { apiGet } = useApi()
   /*================================ States ==============================*/
 
   const [recordPost, setRecordPost] = useState<IRecordPost>()
@@ -26,7 +28,7 @@ export default function RecordsShowPost() {
         setRecordPost(data)
       }
     )
-  }, [params.id])
+  }, [apiGet, params.id])
   /*================================ Effects ==============================*/
   useEffect(() => {
     if (!isLoaded) return

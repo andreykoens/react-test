@@ -2,7 +2,7 @@
 
 import React, { useCallback, useContext, useEffect } from 'react'
 import { ContextAuth } from 'contexts/Auth'
-import { apiGet, apiPut } from 'utils/api'
+
 import { IRecordPost } from 'types/api'
 import { useParams, useRouter } from 'next/navigation'
 import { SubmitHandler, useForm } from 'react-hook-form'
@@ -16,10 +16,12 @@ import {
   Textarea,
   VStack,
 } from '@chakra-ui/react'
+import { useApi } from 'contexts/Api'
 
 export default function DashboardPostsUpdate() {
   /*================================ Constants ==============================*/
   const { isLoaded, isLogged } = useContext(ContextAuth)
+  const { apiGet, apiPut } = useApi()
   const router = useRouter()
   const params = useParams()
   const {
@@ -32,17 +34,14 @@ export default function DashboardPostsUpdate() {
   /*================================ States ==============================*/
 
   /*================================ Functions ==============================*/
-  const handleRecordPostUpdate = useCallback((props: IRecordPost) => {
-    console.log(props)
-    apiPut(
-      '/posts/update',
-      String(props.id),
-      { title: props.title, content: props.content },
-      () => {
+  const handleRecordPostUpdate = useCallback(
+    (props: IRecordPost) => {
+      apiPut('/posts/update', { post_id: String(props.id), post: { ...props } }, () => {
         console.log('ok!')
-      }
-    )
-  }, [])
+      })
+    },
+    [apiPut]
+  )
 
   const getPost = useCallback(() => {
     apiGet<{ post_id: number }, IRecordPost>(
@@ -52,7 +51,7 @@ export default function DashboardPostsUpdate() {
         reset(data)
       }
     )
-  }, [params.id, reset])
+  }, [apiGet, params.id, reset])
 
   const onSubmit: SubmitHandler<IRecordPost> = (data) => {
     handleRecordPostUpdate(data)

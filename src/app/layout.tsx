@@ -14,19 +14,22 @@ import '@fontsource/poppins/300.css'
 import '@fontsource/poppins/500.css'
 import '@fontsource/poppins/600.css'
 import { Footer } from 'components/Footer'
+import { ContextApiProvider } from 'contexts/Api'
 
 export const metadata: Metadata = {
-  title: 'React Test',
-  description: 'Technical test of recent code practices',
+  title: 'Gibberish™️',
+  description: 'Blá blá blá',
 }
 
 export function Providers({ children }: { children: React.ReactNode }) {
   return (
-    <ContextAuthProvider>
-      <CacheProvider>
-        <ChakraProvider theme={theme}>{children}</ChakraProvider>
-      </CacheProvider>
-    </ContextAuthProvider>
+    <ContextApiProvider>
+      <ContextAuthProvider>
+        <CacheProvider>
+          <ChakraProvider theme={theme}>{children}</ChakraProvider>
+        </CacheProvider>
+      </ContextAuthProvider>
+    </ContextApiProvider>
   )
 }
 

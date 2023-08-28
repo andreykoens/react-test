@@ -3,24 +3,25 @@
 import React, { useCallback, useContext, useEffect, useState } from 'react'
 import { ContextAuth } from 'contexts/Auth'
 import { useRouter } from 'next/navigation'
-import { apiPost } from 'utils/api'
+
 import { IRecordPost } from 'types/api'
 import { v4 } from 'uuid'
 import { Box, Flex, HStack, Heading, SimpleGrid, Text, VStack, Link } from '@chakra-ui/react'
 import { RecordCommentActions } from 'components/RecordCommentActions'
+import { useApi } from 'contexts/Api'
 
 export default function DashboardCommentsList() {
   /*================================ Constants ==============================*/
   const { isLoaded, isLogged, user } = useContext(ContextAuth)
   const router = useRouter()
+  const { apiGet } = useApi()
   /*================================ States ==============================*/
   const [recordsPosts, setRecordsPosts] = useState<IRecordPost[]>([])
 
   /*================================ Functions ==============================*/
   const getPosts = useCallback(() => {
     if (!user) return
-    apiPost('/posts', {}, (data: Record<string | number, IRecordPost>) => {
-      delete data['message']
+    apiGet<unknown, Record<string | number, IRecordPost>>('/posts', {}, (data) => {
       const allPosts = Object.values(data)
       const posts = allPosts.filter((post) => {
         if (!('comments' in post) || post.comments.length <= 0) return false
@@ -31,7 +32,7 @@ export default function DashboardCommentsList() {
       })
       setRecordsPosts(posts)
     })
-  }, [user])
+  }, [apiGet, user])
 
   /*================================ Effects ==============================*/
   useEffect(() => {

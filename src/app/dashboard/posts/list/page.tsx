@@ -3,7 +3,7 @@
 import React, { useCallback, useContext, useEffect, useState } from 'react'
 import { ContextAuth } from 'contexts/Auth'
 import { useRouter } from 'next/navigation'
-import { apiDelete, apiPost } from 'utils/api'
+
 import { IRecordPost, IRecordPostDelete } from 'types/api'
 import { v4 } from 'uuid'
 import {
@@ -19,23 +19,24 @@ import {
 } from '@chakra-ui/react'
 import { EmptyList } from 'components/EmptyList'
 import { randomDrift } from 'styles/theme'
+import { useApi } from 'contexts/Api'
 
 export default function DashboardPostsList() {
   /*================================ Constants ==============================*/
   const { isLoaded, isLogged, user } = useContext(ContextAuth)
   const router = useRouter()
+  const { apiGet, apiDelete } = useApi()
   /*================================ States ==============================*/
   const [recordsPosts, setRecordsPosts] = useState<IRecordPost[]>([])
 
   /*================================ Functions ==============================*/
   const getPosts = useCallback(() => {
     if (!user) return
-    apiPost('/posts', {}, (data: Record<string | number, IRecordPost>) => {
-      delete data['message']
+    apiGet<unknown, Record<string | number, IRecordPost>>('/posts', {}, (data) => {
       const posts = Object.values(data).filter((p) => p.user_id === user.id)
       setRecordsPosts(posts)
     })
-  }, [user])
+  }, [apiGet, user])
 
   const deletePost = useCallback(
     (data: IRecordPostDelete) => {
@@ -44,7 +45,7 @@ export default function DashboardPostsList() {
         getPosts()
       })
     },
-    [getPosts, isLogged]
+    [apiDelete, getPosts, isLogged]
   )
 
   /*================================ Effects ==============================*/

@@ -1,9 +1,10 @@
 'use client'
 
 import React, { useCallback, useMemo } from 'react'
-import { apiDelete } from 'utils/api'
+
 import { Button, HStack, Text, Tooltip, VStack } from '@chakra-ui/react'
 import { randomDrift } from 'styles/theme'
+import { useApi } from 'contexts/Api'
 
 interface IRecordCommentActions {
   commentId: number
@@ -16,15 +17,15 @@ export const RecordCommentActions = ({
   position,
 }: IRecordCommentActions): JSX.Element => {
   /*================================ Constants ==============================*/
-
+  const { apiDelete } = useApi()
   /*================================ States ==============================*/
 
   /*================================ Functions ==============================*/
   const deleteComment = useCallback(() => {
-    apiDelete('/comments/remove', { post_id: postId, comment_id: commentId }, (data) => {
-      console.log(postId, commentId, data)
+    apiDelete('/comments/remove', { post_id: postId, comment_id: commentId }, () => {
+      console.log(postId, commentId)
     })
-  }, [commentId, postId])
+  }, [apiDelete, commentId, postId])
 
   /*================================ Effects ==============================*/
   /*================================ Memos ==============================*/

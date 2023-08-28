@@ -2,7 +2,7 @@
 
 import React, { useCallback, useContext, useEffect, useRef } from 'react'
 import { ContextAuth } from 'contexts/Auth'
-import { apiPost } from 'utils/api'
+
 import { IRegister } from 'types/api'
 import { useRouter } from 'next/navigation'
 import { useForm, SubmitHandler } from 'react-hook-form'
@@ -18,11 +18,13 @@ import {
   InputRightElement,
   VStack,
 } from '@chakra-ui/react'
+import { useApi } from 'contexts/Api'
 
 export default function Register() {
   /*================================ Constants ==============================*/
   const { isLoaded, isLogged } = useContext(ContextAuth)
   const router = useRouter()
+  const { apiPost } = useApi()
   const {
     register,
     formState: { errors },
@@ -43,7 +45,7 @@ export default function Register() {
         router.push('/')
       })
     },
-    [router]
+    [apiPost, router]
   )
 
   const onSubmit: SubmitHandler<IRegister> = (data) => {

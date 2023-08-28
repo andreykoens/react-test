@@ -2,13 +2,8 @@
 
 export interface IResponse<T> {
   success: boolean
-  data: T
   message?: string
-}
-
-export interface IResponseError {
-  success: boolean
-  message: string
+  data?: T
 }
 
 /*================================ Auth ==============================*/

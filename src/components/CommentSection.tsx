@@ -3,13 +3,13 @@
 import { ContextAuth } from 'contexts/Auth'
 import { useRouter } from 'next/navigation'
 import React, { useCallback, useContext, useEffect, useState } from 'react'
-import { IRecordComment, IResponseError, IResponse } from 'types/api'
-import { apiGet, apiPost } from 'utils/api'
+import { IRecordComment } from 'types/api'
+
 import { useForm, SubmitHandler } from 'react-hook-form'
 import { v4 } from 'uuid'
-import { alertError, alertErrorApi } from 'utils/alerts'
 import { Box, Button } from '@chakra-ui/react'
 import { RecordCommentShow } from './RecordCommentShow'
+import { useApi } from 'contexts/Api'
 
 interface ICommentSection {
   post_id: number
@@ -24,6 +24,7 @@ export const CommentSection = ({ comments, post_id, allowPost }: ICommentSection
   /*================================ Constants ==============================*/
   const { isLoaded, isLogged } = useContext(ContextAuth)
   const router = useRouter()
+  const { apiGet, apiPost, apiPut } = useApi()
   const {
     register,
     formState: { errors },
@@ -37,10 +38,10 @@ export const CommentSection = ({ comments, post_id, allowPost }: ICommentSection
   const [showEditComment, setShowEditComment] = useState<boolean>(false)
   /*================================ Functions ==============================*/
   const getComments = useCallback(() => {
-    apiGet('/comments', { post_id }, (data: IRecordCommentEditable[]) => {
+    apiGet<{ post_id: number }, IRecordCommentEditable[]>('/comments', { post_id }, (data) => {
       setCurrentComments(Object.values(data))
     })
-  }, [post_id])
+  }, [apiGet, post_id])
   // const deleteComment = useCallback(
   //   (data: IRecordCommentDelete) => {
   //     if (!isLogged) return
@@ -50,36 +51,23 @@ export const CommentSection = ({ comments, post_id, allowPost }: ICommentSection
   //   },
   //   [getComments, isLogged]
   // )
-  const putComment = useCallback(
-    (id: number, data: IRecordCommentEditable) => {
-      if (!isLogged) return
-      window.FakerApi.put('/comments/update', {
-        post_id: post_id,
-        comment_id: id,
-        comment: data,
+  const handleRecordCommentUpdate = useCallback(
+    (id: number, props: IRecordComment) => {
+      apiPut('/comment/update', { post_id: post_id, comment_id: id, comment: { ...props } }, () => {
+        getComments()
+        reset()
       })
-        .catch((err: IResponseError) => {
-          alertError(err)
-        })
-        .then((response: IResponse<IRecordCommentEditable>) => {
-          if (!response) {
-            alertErrorApi()
-            return
-          }
-          getComments()
-          reset()
-        })
     },
-    [getComments, isLogged, post_id, reset]
+    [apiPut, getComments, post_id, reset]
   )
   const postComment = useCallback(
-    (data: IRecordCommentEditable) => {
+    (props: IRecordCommentEditable) => {
       if (!isLogged) return
       apiPost(
         '/comments/create',
         {
           post_id: post_id,
-          comment: data,
+          comment: props,
         },
         () => {
           getComments()
@@ -87,7 +75,7 @@ export const CommentSection = ({ comments, post_id, allowPost }: ICommentSection
         }
       )
     },
-    [getComments, isLogged, post_id, reset]
+    [apiPost, getComments, isLogged, post_id, reset]
   )
 
   const onSubmitCommentNew: SubmitHandler<IRecordComment> = (data) => {
@@ -95,7 +83,7 @@ export const CommentSection = ({ comments, post_id, allowPost }: ICommentSection
   }
   const onSubmitCommentEdit: SubmitHandler<IRecordCommentEditable> = (data) => {
     data.content = data.contentEdit
-    putComment(data.id, data)
+    handleRecordCommentUpdate(data.id, data)
     setShowEditComment(false)
     reset()
   }

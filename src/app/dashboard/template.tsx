@@ -3,17 +3,19 @@
 import React, { useCallback, useContext, useEffect, useState } from 'react'
 import { Box, Button, Flex, HStack, Heading, Text, Tooltip, VStack } from '@chakra-ui/react'
 import { usePathname, useRouter } from 'next/navigation'
-import { apiPost } from 'utils/api'
+
 import { IRecordPost } from 'types/api'
 import { ContextAuth } from 'contexts/Auth'
 import { SeedByUserComments, SeedByUserPosts } from 'utils/seed'
 import { randomDrift } from 'styles/theme'
 import { WipeByUserComments, WipeByUserPosts } from 'utils/wipe'
+import { useApi } from 'contexts/Api'
 
 export default function TemplateDashboard({ children }) {
   /*================================ Constants ==============================*/
   const router = useRouter()
   const pathname = usePathname()
+  const { apiGet } = useApi()
   const { isLoaded, isLogged, user } = useContext(ContextAuth)
   /*================================ States ==============================*/
   const [currentCommentsAmount, setCurrentCommentsAmout] = useState<number>(0)
@@ -21,7 +23,7 @@ export default function TemplateDashboard({ children }) {
   /*================================ Functions ==============================*/
   const getPosts = useCallback(() => {
     if (!user) return
-    apiPost('/posts', {}, (data: Record<string | number, IRecordPost>) => {
+    apiGet<unknown, Record<string | number, IRecordPost>>('/posts', {}, (data) => {
       let newCommentsAmount = 0
       let newPostsAmount = 0
       Object.values(data).forEach((post) => {
@@ -35,7 +37,7 @@ export default function TemplateDashboard({ children }) {
         setCurrentPostsAmout(newPostsAmount)
       }, [])
     })
-  }, [user])
+  }, [apiGet, user])
   /*================================ Effects ==============================*/
   useEffect(() => {
     if (!isLoaded) return
