@@ -49,7 +49,6 @@ export const ContextAuthProvider: React.FC<FCProps> = ({
     fakerApi
       .get('/me', {})
       .catch((response) => {
-        console.log(response)
         if (!response.success) {
           setUser(null)
           setIsLogged(false)

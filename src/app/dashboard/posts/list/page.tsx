@@ -20,12 +20,14 @@ import {
 import { EmptyList } from 'components/EmptyList'
 import { randomDrift } from 'styles/theme'
 import { useApi } from 'contexts/Api'
+import { usePersistent } from 'contexts/Persistent'
 
 export default function DashboardPostsList() {
   /*================================ Constants ==============================*/
   const { isLogged, user } = useContext(ContextAuth)
   const router = useRouter()
   const { apiGet, apiDelete } = useApi()
+  const { updatePosts } = usePersistent()
   /*================================ States ==============================*/
   const [recordsPosts, setRecordsPosts] = useState<IRecordPost[]>([])
   const [isLoading, setIsLoading] = useState<boolean>(true)
@@ -53,7 +55,8 @@ export default function DashboardPostsList() {
   useEffect(() => {
     setIsLoading(true)
     getPosts()
-  }, [getPosts, isLogged, router])
+    updatePosts()
+  }, [getPosts, isLogged, router, updatePosts])
 
   /*================================ Memos ==============================*/
   /*================================ Render ==============================*/

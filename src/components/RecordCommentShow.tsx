@@ -37,7 +37,6 @@ export const RecordCommentShow = ({ Record, postId }: IRecordCommentShow): JSX.E
   return (
     <Box
       key={`comment-${v4()}`}
-      padding={10}
       verticalAlign={'middle'}
       display={'inline-block'}
       width={'22%'}
@@ -60,26 +59,27 @@ export const RecordCommentShow = ({ Record, postId }: IRecordCommentShow): JSX.E
         zIndex: 500,
         background: '#f0f0f0',
       }}
-      onClick={(e) => {
-        navigator.clipboard.writeText(`${username} diz: ${Record.content}`)
-        eventClipboardCopy(e.pageX, e.pageY)
-      }}
     >
-      <Text fontWeight={500} opacity={0.8} mt={-3} mb={3}>
-        {username}
-      </Text>
-      <Text fontWeight={300}>{Record.content}</Text>
+      <Box
+        padding={10}
+        onClick={(e) => {
+          navigator.clipboard.writeText(`${username} diz: ${Record.content}`)
+          eventClipboardCopy(e.pageX, e.pageY)
+        }}
+      >
+        <Text fontWeight={500} opacity={0.8} mt={-3} mb={3}>
+          {username}
+        </Text>
+        <Text fontWeight={300}>{Record.content}</Text>
+      </Box>
 
       {user && user.id === Record.user_id && (
         <RecordCommentActions
-          commentId={1}
+          commentId={Record.id}
           postId={postId}
           position={'bottom'}
+          comment={Record}
         ></RecordCommentActions>
-        // <div style={{ float: 'right' }}>
-        //   <button onClick={EditAction}>Edit</button>
-        //   <button onClick={DeleteAction}>X</button>
-        // </div>
       )}
     </Box>
   )

@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useCallback, useContext, useEffect, useRef } from 'react'
+import React, { useCallback, useContext, useRef } from 'react'
 import { ContextAuth } from 'contexts/Auth'
 import { ILogin } from 'types/api'
 import { useRouter } from 'next/navigation'
@@ -20,7 +20,7 @@ import {
 
 export default function Login() {
   /*================================ Constants ==============================*/
-  const { isLogged, login } = useContext(ContextAuth)
+  const { login } = useContext(ContextAuth)
   const router = useRouter()
   const {
     register,

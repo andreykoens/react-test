@@ -52,8 +52,18 @@ export const Presentation = ({}): JSX.Element => {
   /*================================ Effects ==============================*/
   /*================================ Render ==============================*/
   return (
-    <Flex id={'Presentation'} height={'700px'} alignContent={'center'}>
-      {/* <EmptyList></EmptyList> */}
+    <Flex id={'Presentation'} height={'500px'} alignContent={'center'}>
+      <Box
+        position={'fixed'}
+        top={0}
+        left={0}
+        h={'100vh'}
+        w={'100vw'}
+        background={'url(/bg.jpg)'}
+        backgroundPosition={'center'}
+        backgroundSize={'cover'}
+        zIndex={-1}
+      ></Box>
       <Flex w={'50%'} flexDir={'row'} justifyContent={'flex-end'}>
         <Box fontSize={20} lineHeight={'2.4em'} w={'450px'} textAlign={'right'} mr={6}>
           <b>Gibberish™️</b> é um breve site para ler lorem ipsum, e em passear por ele, ver que

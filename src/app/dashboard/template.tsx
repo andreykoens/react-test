@@ -1,47 +1,28 @@
 'use client'
 
-import React, { useCallback, useContext, useEffect, useState } from 'react'
+import React, { useContext } from 'react'
 import { Box, Button, Flex, HStack, Heading, Text, Tooltip, VStack } from '@chakra-ui/react'
 import { usePathname, useRouter } from 'next/navigation'
 
-import { IRecordPost } from 'types/api'
 import { ContextAuth } from 'contexts/Auth'
 import { SeedByUserComments, SeedByUserPosts } from 'utils/seed'
 import { randomDrift } from 'styles/theme'
 import { WipeByUserComments, WipeByUserPosts } from 'utils/wipe'
-import { useApi } from 'contexts/Api'
+import { usePersistent } from 'contexts/Persistent'
 
 export default function TemplateDashboard({ children }) {
   /*================================ Constants ==============================*/
   const router = useRouter()
   const pathname = usePathname()
-  const { apiGet } = useApi()
+
   const { user } = useContext(ContextAuth)
+  const { currentPostsAmount, currentCommentsAmount } = usePersistent()
   /*================================ States ==============================*/
-  const [currentCommentsAmount, setCurrentCommentsAmout] = useState<number>(0)
-  const [currentPostsAmount, setCurrentPostsAmout] = useState<number>(0)
+
   /*================================ Functions ==============================*/
-  const getPosts = useCallback(() => {
-    if (!user) return
-    apiGet<unknown, Record<string | number, IRecordPost>>('/posts', {}, (data) => {
-      let newCommentsAmount = 0
-      let newPostsAmount = 0
-      Object.values(data).forEach((post) => {
-        if (post.user_id === user.id) newPostsAmount++
-        if (post.comments) {
-          post.comments.forEach((comment) => {
-            if (comment.user_id === user.id) newCommentsAmount++
-          })
-        }
-        setCurrentCommentsAmout(newCommentsAmount)
-        setCurrentPostsAmout(newPostsAmount)
-      }, [])
-    })
-  }, [apiGet, user])
+
   /*================================ Effects ==============================*/
-  useEffect(() => {
-    getPosts()
-  }, [getPosts, router])
+
   /*================================ Render ==============================*/
 
   return (

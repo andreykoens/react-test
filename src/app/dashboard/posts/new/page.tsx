@@ -1,7 +1,6 @@
 'use client'
 
-import React, { useCallback, useContext, useEffect } from 'react'
-import { ContextAuth } from 'contexts/Auth'
+import React, { useCallback } from 'react'
 
 import { IRecordPost } from 'types/api'
 import { useRouter } from 'next/navigation'
@@ -20,7 +19,7 @@ import { useApi } from 'contexts/Api'
 
 export default function Register() {
   /*================================ Constants ==============================*/
-  const { isLogged } = useContext(ContextAuth)
+
   const router = useRouter()
   const { apiPost } = useApi()
   const {

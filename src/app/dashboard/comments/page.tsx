@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useCallback, useContext, useEffect, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import { ContextAuth } from 'contexts/Auth'
 import { useRouter } from 'next/navigation'
 
@@ -8,41 +8,46 @@ import { IRecordPost } from 'types/api'
 import { v4 } from 'uuid'
 import { Box, Flex, HStack, Heading, SimpleGrid, Text, VStack, Link } from '@chakra-ui/react'
 import { RecordCommentActions } from 'components/RecordCommentActions'
-import { useApi } from 'contexts/Api'
+import { usePersistent } from 'contexts/Persistent'
 
 export default function DashboardCommentsList() {
   /*================================ Constants ==============================*/
   const { isLogged, user } = useContext(ContextAuth)
   const router = useRouter()
-  const { apiGet } = useApi()
+  const { posts, updatePosts } = usePersistent()
   /*================================ States ==============================*/
-  const [recordsPosts, setRecordsPosts] = useState<IRecordPost[]>([])
-
+  const [filteredComments, setFilteredComments] = useState<IRecordPost[]>([])
   /*================================ Functions ==============================*/
-  const getPosts = useCallback(() => {
-    if (!user) return
-    apiGet<unknown, Record<string | number, IRecordPost>>('/posts', {}, (data) => {
-      const allPosts = Object.values(data)
-      const posts = allPosts.filter((post) => {
-        if (!('comments' in post) || post.comments.length <= 0) return false
-        post.comments = post.comments.filter((comment) => {
-          return comment.user_id === user.id
-        })
-        return post.comments.length > 0
-      })
-      setRecordsPosts(posts)
-    })
-  }, [apiGet, user])
 
   /*================================ Effects ==============================*/
   useEffect(() => {
-    getPosts()
-  }, [getPosts, isLogged, router])
+    updatePosts()
+  }, [isLogged, router, updatePosts])
 
+  useEffect(() => {
+    const newFilteredComments = []
+    posts.forEach((post) => {
+      const filteredPostComments = []
+      if (post.comments) {
+        post.comments.forEach((comment) => {
+          if (comment.user_id === user.id) filteredPostComments.push(comment)
+        })
+        delete post['comments']
+
+        if (filteredPostComments.length > 0) {
+          newFilteredComments.push({
+            ...post,
+            comments: filteredPostComments,
+          })
+        }
+      }
+      setFilteredComments(newFilteredComments)
+    }, [])
+  }, [posts, user])
   /*================================ Memos ==============================*/
   /*================================ Render ==============================*/
 
-  if (!recordsPosts || (recordsPosts && recordsPosts.length === 0)) {
+  if (!filteredComments || (filteredComments && filteredComments.length === 0)) {
     return (
       <Flex
         flexGrow={1}
@@ -63,8 +68,8 @@ export default function DashboardCommentsList() {
   }
   return (
     <VStack gap={6}>
-      {recordsPosts &&
-        recordsPosts.map((post: IRecordPost) => (
+      {filteredComments &&
+        filteredComments.map((post: IRecordPost) => (
           <HStack
             key={`post-${v4()}`}
             w={'full'}
@@ -99,6 +104,7 @@ export default function DashboardCommentsList() {
                       commentId={comment.id}
                       postId={post.id}
                       position={'right'}
+                      comment={comment}
                     ></RecordCommentActions>
                   </Box>
                 ))}

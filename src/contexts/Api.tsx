@@ -39,7 +39,6 @@ export const ContextApiProvider: React.FC<FCProps> = ({
 
   const alertFeedback = useCallback(
     <T,>(response: IResponse<T>, method?: string, url?: string) => {
-      console.log(response)
       const reference = method && url ? `REF: ${method} @ ${url}` : ''
       if (!response) return
       toastIdRef.current = toast({
@@ -92,7 +91,6 @@ export const ContextApiProvider: React.FC<FCProps> = ({
           alertFeedback(error, 'GET', url)
         })
         .then((response: IResponse<K>) => {
-          console.log(url, props, response)
           action(response.data)
         })
     },
@@ -122,6 +120,7 @@ export const ContextApiProvider: React.FC<FCProps> = ({
           alertFeedback(error, 'DELETE', url)
         })
         .then((response: IResponse<void>) => {
+          if (!response) return
           alertFeedback<void>(response)
           action()
         })

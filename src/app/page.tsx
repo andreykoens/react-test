@@ -26,7 +26,7 @@ export default function Home() {
     })
   }, [apiGet])
   const EndOfRecords = useMemo(() => {
-    return 'tinha, e agora acabou'.split('').map((letter) => (
+    return 'teve, e agora acabou'.split('').map((letter) => (
       <Text
         display={'inline-block'}
         key={v4()}

@@ -20,8 +20,8 @@ export const randomDrift = (strength: number, speed: number): string => {
     ${speed}ms
     ${getRandomBoolean() ? 'alternate' : 'alternate-reverse'}
     linear`
-  // return animation
-  return ''
+  return animation
+  // return ''
 }
 
 export const theme = extendTheme({
@@ -49,6 +49,6 @@ export const randomJump = (delayMin: number, delayMax: number): string => {
     infinite
     ${waitTime + animTime}ms
     ease`
-  // return animation
-  return ''
+  return animation
+  // return ''
 }

@@ -14,6 +14,7 @@ import '@fontsource/poppins/500.css'
 import '@fontsource/poppins/600.css'
 import { Footer } from 'components/Footer'
 import { ContextApiProvider } from 'contexts/Api'
+import { ContextPersistentProvider } from 'contexts/Persistent'
 
 export const metadata: Metadata = {
   title: 'Gibberish™️',
@@ -24,9 +25,11 @@ export function Providers({ children }: { children: React.ReactNode }) {
   return (
     <ContextApiProvider>
       <ContextAuthProvider>
-        <CacheProvider>
-          <ChakraProvider theme={theme}>{children}</ChakraProvider>
-        </CacheProvider>
+        <ContextPersistentProvider>
+          <CacheProvider>
+            <ChakraProvider theme={theme}>{children}</ChakraProvider>
+          </CacheProvider>
+        </ContextPersistentProvider>
       </ContextAuthProvider>
     </ContextApiProvider>
   )
