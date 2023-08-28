@@ -40,6 +40,7 @@ pnpm dev
 
 #### Desenvolvimento
 - 95% do código das páginas e eventos foi feito na mão, fora alguns itens do próprio pacote.
+- Existem poucas excessões, mas tipei tudo o que consegui.
 - Não houve preocupação com mobile ou performance neste exercício.
 - Optei por evitar utilizar muitas bibliotecas e itens prontos.
 - O código deve buildar sem erros.
