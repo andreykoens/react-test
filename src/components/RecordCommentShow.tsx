@@ -30,7 +30,7 @@ export const RecordCommentShow = ({ Record, postId }: IRecordCommentShow): JSX.E
   }, [])
 
   const username = useMemo(() => {
-    return nameIndex.find((e) => e.id === Record.user_id).name
+    return nameIndex.find((e) => e.id === Record.user_id)?.name || 'autor desconhecido'
   }, [Record.user_id, nameIndex])
   /*================================ Effects ==============================*/
   /*================================ Render ==============================*/

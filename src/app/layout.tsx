@@ -3,7 +3,6 @@
 import React from 'react'
 import type { Metadata } from 'next'
 import { ContextAuthProvider } from 'contexts/Auth'
-import Script from 'next/script'
 import { Header } from 'components/Header'
 import { CacheProvider } from '@chakra-ui/next-js'
 import { ChakraProvider, Flex } from '@chakra-ui/react'
@@ -36,7 +35,6 @@ export function Providers({ children }: { children: React.ReactNode }) {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="pt-BR">
-      <Script src="/fakerApi.js"></Script>
       <body>
         <Providers>
           <Flex

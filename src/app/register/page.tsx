@@ -22,7 +22,7 @@ import { useApi } from 'contexts/Api'
 
 export default function Register() {
   /*================================ Constants ==============================*/
-  const { isLoaded, isLogged } = useContext(ContextAuth)
+  const { isLogged } = useContext(ContextAuth)
   const router = useRouter()
   const { apiPost } = useApi()
   const {
@@ -42,7 +42,7 @@ export default function Register() {
   const handleRegister = useCallback(
     (props: IRegister) => {
       apiPost('/register', props, () => {
-        router.push('/')
+        router.push('/login')
       })
     },
     [apiPost, router]
@@ -52,10 +52,7 @@ export default function Register() {
     handleRegister(data)
   }
   /*================================ Effects ==============================*/
-  useEffect(() => {
-    if (!isLoaded) return
-    if (isLogged) router.push('/')
-  }, [isLoaded, isLogged, router])
+
   /*================================ Memos ==============================*/
   /*================================ Render ==============================*/
   return (
@@ -160,7 +157,9 @@ export default function Register() {
               Lembrei! Eu tenho um cadastro
             </Button>
             {/* <Spacer></Spacer> */}
-            <Button onClick={handleSubmit(onSubmit)}>Cadastrar</Button>
+            <Button type={'submit'} onClick={handleSubmit(onSubmit)}>
+              Cadastrar
+            </Button>
           </HStack>
         </VStack>
       </form>

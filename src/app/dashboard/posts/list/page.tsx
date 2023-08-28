@@ -23,18 +23,19 @@ import { useApi } from 'contexts/Api'
 
 export default function DashboardPostsList() {
   /*================================ Constants ==============================*/
-  const { isLoaded, isLogged, user } = useContext(ContextAuth)
+  const { isLogged, user } = useContext(ContextAuth)
   const router = useRouter()
   const { apiGet, apiDelete } = useApi()
   /*================================ States ==============================*/
   const [recordsPosts, setRecordsPosts] = useState<IRecordPost[]>([])
-
+  const [isLoading, setIsLoading] = useState<boolean>(true)
   /*================================ Functions ==============================*/
   const getPosts = useCallback(() => {
     if (!user) return
     apiGet<unknown, Record<string | number, IRecordPost>>('/posts', {}, (data) => {
       const posts = Object.values(data).filter((p) => p.user_id === user.id)
       setRecordsPosts(posts)
+      setIsLoading(false)
     })
   }, [apiGet, user])
 
@@ -50,17 +51,14 @@ export default function DashboardPostsList() {
 
   /*================================ Effects ==============================*/
   useEffect(() => {
-    if (!isLoaded) return
-    if (isLoaded && !isLogged) {
-      router.push('/')
-    }
+    setIsLoading(true)
     getPosts()
-  }, [getPosts, isLoaded, isLogged, router])
+  }, [getPosts, isLogged, router])
 
   /*================================ Memos ==============================*/
   /*================================ Render ==============================*/
 
-  if (recordsPosts && recordsPosts.length === 0) {
+  if (!isLoading && recordsPosts && recordsPosts.length === 0) {
     return (
       <Flex
         flexGrow={1}
@@ -76,7 +74,6 @@ export default function DashboardPostsList() {
   return (
     <SimpleGrid columns={2} gap={10} flexGrow={1} pt={0}>
       {/*================== POSTS =================*/}
-      {recordsPosts && recordsPosts.length === 0 && <EmptyList></EmptyList>}
       {recordsPosts &&
         recordsPosts.map((post: IRecordPost) => (
           <HStack

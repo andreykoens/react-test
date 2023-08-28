@@ -125,9 +125,20 @@ export const Header = ({}): JSX.Element => {
           <Spacer />
           {isLogged && (
             <Box>
-              {JSON.stringify(user, null, 2)}
+              {user && (
+                <Box display={'inline-block'} mr={6}>
+                  Olá{' '}
+                  <Text as={'span'} fontWeight={600}>
+                    {user?.name}
+                  </Text>
+                </Box>
+              )}
               {!pathname.includes('dashboard') && (
                 <Button
+                  variant={'solid'}
+                  borderRadius={30}
+                  background={'white'}
+                  mr={4}
                   onClick={() => {
                     router.push('/dashboard/posts/list')
                   }}
@@ -135,8 +146,10 @@ export const Header = ({}): JSX.Element => {
                   Dashboard
                 </Button>
               )}
-
               <Button
+                variant={'solid'}
+                borderRadius={30}
+                background={'white'}
                 onClick={() => {
                   logout()
                 }}
@@ -156,7 +169,7 @@ export const Header = ({}): JSX.Element => {
                   router.push('/register')
                 }}
               >
-                Sem cadastro?
+                Cadastrar
               </Button>
               <Button
                 variant={'solid'}

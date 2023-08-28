@@ -1,16 +1,11 @@
 'use client'
 
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
-import { ILogin, IRecordUser } from 'types/api'
+import { ILogin, IRecordUser, IResponse } from 'types/api'
 import { useApi } from './Api'
-
-declare global {
-  interface Window {
-    // The API is a non typescript external asset
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    FakerApi: any
-  }
-}
+import { usePathname, useRouter } from 'next/navigation'
+import FakerApi from 'utils/fakerApi'
+const fakerApi = new FakerApi()
 
 interface INameIndexItem {
   id: number
@@ -18,7 +13,6 @@ interface INameIndexItem {
 }
 
 interface IContextAuth {
-  isLoaded: boolean
   user: IRecordUser
   isLogged: boolean
   // False positive
@@ -41,40 +35,50 @@ export const ContextAuthProvider: React.FC<FCProps> = ({
   children: React.ReactNode
 }) => {
   /*================================ Constants ==============================*/
-  const { apiGet, apiPost } = useApi()
+  const { apiPost } = useApi()
+  const router = useRouter()
+  const pathname = usePathname()
   /*================================ States ==============================*/
   const [user, setUser] = useState<IRecordUser>()
   const [isLogged, setIsLogged] = useState<boolean>(false)
-  const [isLoaded, setIsLoaded] = useState<boolean>(false)
   const [nameIndex, setNameIndex] = useState<INameIndexItem[]>([])
 
   /*================================ Functions ==============================*/
-  const Reset = useCallback(() => {
-    setUser(null)
-    setIsLogged(false)
-  }, [])
+
   const getUserData = useCallback(() => {
-    apiGet<unknown, IRecordUser>('/me', {}, (data) => {
-      setUser(data)
-      setIsLogged(true)
-    })
-  }, [apiGet])
+    fakerApi
+      .get('/me', {})
+      .catch((response) => {
+        console.log(response)
+        if (!response.success) {
+          setUser(null)
+          setIsLogged(false)
+        }
+      })
+      .then((response: IResponse<IRecordUser>) => {
+        if (response && 'success' in response) {
+          setUser(response.data as IRecordUser)
+          setIsLogged(true)
+        }
+      })
+  }, [])
 
   const login = useCallback(
     (props: ILogin) => {
       apiPost('/login', props, () => {
         getUserData()
+        router.push('/')
       })
     },
-    [apiPost, getUserData]
+    [apiPost, getUserData, router]
   )
 
   const logout = useCallback(() => {
     apiPost('/logout', {}, () => {
       setIsLogged(false)
-      Reset()
+      setUser(null)
     })
-  }, [Reset, apiPost])
+  }, [apiPost])
 
   const buildNameIndex = useCallback(() => {
     const newNameIndex: INameIndexItem[] = []
@@ -90,25 +94,23 @@ export const ContextAuthProvider: React.FC<FCProps> = ({
   /*================================ Effects ==============================*/
   // Hacky-ish, will work for the mock-up
   useEffect(() => {
-    if (!isLogged) {
-      const authCheck: string = localStorage.getItem('auth')
-      if (authCheck && authCheck.length > 0) {
-        setIsLogged(true)
-      }
-    }
-    if (isLoaded) return
-    if (!window.FakerApi) {
-      setIsLoaded(false)
-      return
-    }
+    getUserData()
     buildNameIndex()
-    setIsLoaded(true)
-  }, [isLoaded, getUserData, buildNameIndex, isLogged])
+  }, [buildNameIndex, getUserData])
+
+  useEffect(() => {
+    const authCheck = localStorage.getItem('auth')
+    if (!authCheck && pathname.includes('dashboard')) {
+      router.push('/')
+    }
+    if (authCheck && (pathname.includes('login') || pathname.includes('register'))) {
+      router.push('/')
+    }
+  }, [isLogged, pathname, router, user])
 
   /*================================ Memos ==============================*/
   const contextAuthValue: IContextAuth = useMemo(
     () => ({
-      isLoaded,
       user,
       isLogged,
       login,
@@ -116,7 +118,7 @@ export const ContextAuthProvider: React.FC<FCProps> = ({
       nameIndex,
       buildNameIndex,
     }),
-    [isLoaded, user, isLogged, login, logout, nameIndex, buildNameIndex]
+    [user, isLogged, login, logout, nameIndex, buildNameIndex]
   )
 
   /*================================ Render ==============================*/

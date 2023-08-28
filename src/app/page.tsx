@@ -1,7 +1,6 @@
 'use client'
 
-import React, { useCallback, useContext, useEffect, useMemo, useState } from 'react'
-import { ContextAuth } from 'contexts/Auth'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
 
 import { IRecordPost } from 'types/api'
 import { v4 } from 'uuid'
@@ -13,16 +12,17 @@ import { useApi } from 'contexts/Api'
 
 export default function Home() {
   /*================================ Constants ==============================*/
-  const { isLoaded } = useContext(ContextAuth)
+
   const { apiGet } = useApi()
 
   /*================================ States ==============================*/
   const [recordsPosts, setRecordsPosts] = useState<IRecordPost[]>([])
-
+  const [isLoading, setIsLoading] = useState<boolean>(true)
   /*================================ Functions ==============================*/
   const getPosts = useCallback(() => {
     apiGet<unknown, Record<string | number, IRecordPost>>('/posts', {}, (data) => {
       setRecordsPosts(Object.values(data))
+      setIsLoading(false)
     })
   }, [apiGet])
   const EndOfRecords = useMemo(() => {
@@ -39,14 +39,12 @@ export default function Home() {
   }, [])
   /*================================ Effects ==============================*/
   useEffect(() => {
-    if (!isLoaded) return
     getPosts()
-    // ListaComments()
-  }, [getPosts, isLoaded])
+  }, [getPosts])
   /*================================ Memos ==============================*/
   /*================================ Render ==============================*/
-  if (recordsPosts && recordsPosts.length === 0) return <Presentation></Presentation>
-  if (recordsPosts && recordsPosts.length > 0)
+  if (!isLoading && recordsPosts && recordsPosts.length === 0) return <Presentation></Presentation>
+  if (!isLoading && recordsPosts && recordsPosts.length > 0)
     return (
       <VStack maxW={'1200px'} mx={'auto'}>
         <>

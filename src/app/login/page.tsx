@@ -20,7 +20,7 @@ import {
 
 export default function Login() {
   /*================================ Constants ==============================*/
-  const { isLoaded, isLogged, login } = useContext(ContextAuth)
+  const { isLogged, login } = useContext(ContextAuth)
   const router = useRouter()
   const {
     register,
@@ -45,10 +45,7 @@ export default function Login() {
     handleLogin(data)
   }
   /*================================ Effects ==============================*/
-  useEffect(() => {
-    if (!isLoaded) return
-    if (isLogged) router.push('/')
-  }, [isLoaded, isLogged, router, login])
+
   /*================================ Memos ==============================*/
   /*================================ Render ==============================*/
   return (

@@ -16,7 +16,7 @@ export default function TemplateDashboard({ children }) {
   const router = useRouter()
   const pathname = usePathname()
   const { apiGet } = useApi()
-  const { isLoaded, isLogged, user } = useContext(ContextAuth)
+  const { user } = useContext(ContextAuth)
   /*================================ States ==============================*/
   const [currentCommentsAmount, setCurrentCommentsAmout] = useState<number>(0)
   const [currentPostsAmount, setCurrentPostsAmout] = useState<number>(0)
@@ -40,11 +40,10 @@ export default function TemplateDashboard({ children }) {
   }, [apiGet, user])
   /*================================ Effects ==============================*/
   useEffect(() => {
-    if (!isLoaded) return
-    if (isLogged == false) router.push('/')
     getPosts()
-  }, [getPosts, isLoaded, isLogged, router])
+  }, [getPosts, router])
   /*================================ Render ==============================*/
+
   return (
     <Flex
       id={'TemplateDashboardWrap'}

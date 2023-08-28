@@ -1,7 +1,6 @@
 'use client'
 
-import React, { useCallback, useContext, useEffect } from 'react'
-import { ContextAuth } from 'contexts/Auth'
+import React, { useCallback, useEffect } from 'react'
 
 import { IRecordPost } from 'types/api'
 import { useParams, useRouter } from 'next/navigation'
@@ -20,7 +19,7 @@ import { useApi } from 'contexts/Api'
 
 export default function DashboardPostsUpdate() {
   /*================================ Constants ==============================*/
-  const { isLoaded, isLogged } = useContext(ContextAuth)
+
   const { apiGet, apiPut } = useApi()
   const router = useRouter()
   const params = useParams()
@@ -34,14 +33,6 @@ export default function DashboardPostsUpdate() {
   /*================================ States ==============================*/
 
   /*================================ Functions ==============================*/
-  const handleRecordPostUpdate = useCallback(
-    (props: IRecordPost) => {
-      apiPut('/posts/update', { post_id: String(props.id), post: { ...props } }, () => {
-        console.log('ok!')
-      })
-    },
-    [apiPut]
-  )
 
   const getPost = useCallback(() => {
     apiGet<{ post_id: number }, IRecordPost>(
@@ -53,19 +44,22 @@ export default function DashboardPostsUpdate() {
     )
   }, [apiGet, params.id, reset])
 
+  const handleRecordPostUpdate = useCallback(
+    (props: IRecordPost) => {
+      apiPut('/posts/update', { post_id: props.id, post: { ...props } }, () => {
+        router.push('/dashboard/posts/list')
+      })
+    },
+    [apiPut, router]
+  )
+
   const onSubmit: SubmitHandler<IRecordPost> = (data) => {
     handleRecordPostUpdate(data)
   }
   /*================================ Effects ==============================*/
   useEffect(() => {
-    if (!isLoaded) return
-    setTimeout(() => {
-      if (isLoaded && !isLogged) {
-        router.push('/')
-      }
-      getPost()
-    }, 50)
-  }, [getPost, isLoaded, isLogged, router])
+    getPost()
+  }, [getPost, router])
   /*================================ Memos ==============================*/
   /*================================ Render ==============================*/
   return (
@@ -86,7 +80,7 @@ export default function DashboardPostsUpdate() {
               {...register('title', {
                 required: 'O título é obrigatório',
                 minLength: { value: 15, message: 'Você precisa utilizar pelo menos 15 caracteres' },
-                maxLength: { value: 60, message: 'O limite de 60 caracteres foi excedido' },
+                maxLength: { value: 100, message: 'O limite de 100 caracteres foi excedido' },
               })}
             />
             <FormErrorMessage>{errors.title && errors.title.message}</FormErrorMessage>

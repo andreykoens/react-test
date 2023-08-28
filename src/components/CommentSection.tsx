@@ -22,7 +22,7 @@ interface IRecordCommentEditable extends IRecordComment {
 
 export const CommentSection = ({ comments, post_id, allowPost }: ICommentSection): JSX.Element => {
   /*================================ Constants ==============================*/
-  const { isLoaded, isLogged } = useContext(ContextAuth)
+  const { isLogged } = useContext(ContextAuth)
   const router = useRouter()
   const { apiGet, apiPost, apiPut } = useApi()
   const {
@@ -89,11 +89,10 @@ export const CommentSection = ({ comments, post_id, allowPost }: ICommentSection
   }
   /*================================ Effects ==============================*/
   useEffect(() => {
-    if (!comments || !isLoaded) return
+    if (!comments) return
     setCurrentComments(comments)
-  }, [comments, isLoaded])
+  }, [comments])
   /*================================ Render ==============================*/
-  if (!isLoaded) return <></>
   return (
     <Box>
       <Box textAlign={'center'}>

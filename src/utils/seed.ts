@@ -8,8 +8,6 @@ const faker = new Faker({
 })
 
 export const SeedGeneric = () => {
-  if (!window.FakerApi) return
-
   //create definitions
   console.log('init seed')
   const amountUsers = Math.floor(Math.random() * 4) + 1
@@ -18,7 +16,7 @@ export const SeedGeneric = () => {
 
   // Create Users
   let nextUserId: number = Number(localStorage.getItem('nextUserId'))
-  if (typeof nextUserId !== 'number') nextUserId = 0
+  if (typeof nextUserId !== 'number') nextUserId = 1
   let rawUsers: string = localStorage.getItem('users')
   if (!rawUsers) rawUsers = '[]'
   const users: IRecordUser[] = JSON.parse(rawUsers)
@@ -44,7 +42,7 @@ export const SeedGeneric = () => {
 
   // Create Posts
   let nextPostId: number = Number(localStorage.getItem('nextPostId'))
-  if (typeof nextPostId !== 'number') nextPostId = 0
+  if (typeof nextPostId !== 'number') nextPostId = 1
   let rawPosts: string = localStorage.getItem('posts')
   if (!rawPosts) rawPosts = '[]'
   const posts: IRecordPost[] = JSON.parse(rawPosts)
@@ -70,7 +68,7 @@ export const SeedGeneric = () => {
 
   // Create Comments
   let nextCommentId: number = Number(localStorage.getItem('nextCommentId'))
-  if (typeof nextCommentId !== 'number') nextCommentId = 0
+  if (typeof nextCommentId !== 'number') nextCommentId = 1
   for (let i = 0; i <= amountComments; i++) {
     const postId = Math.floor(Math.random() * posts.length)
     if (posts && 'comments' in posts[postId]) {
@@ -95,7 +93,7 @@ export const SeedGeneric = () => {
 export const SeedByUserPosts = (id: number) => {
   const amountPosts = Math.floor(Math.random() * 10) + 3
   let nextPostId: number = Number(localStorage.getItem('nextPostId'))
-  if (typeof nextPostId !== 'number') nextPostId = 0
+  if (typeof nextPostId !== 'number') nextPostId = 1
   let rawPosts: string = localStorage.getItem('posts')
   if (!rawPosts) rawPosts = '[]'
   const posts: IRecordPost[] = JSON.parse(rawPosts)
@@ -132,7 +130,7 @@ export const SeedByUserComments = (id: number) => {
   const posts: IRecordPost[] = JSON.parse(rawPosts)
 
   let nextCommentId: number = Number(localStorage.getItem('nextCommentId'))
-  if (typeof nextCommentId !== 'number') nextCommentId = 0
+  if (typeof nextCommentId !== 'number') nextCommentId = 1
   for (let i = 0; i <= amountComments; i++) {
     const postId = Math.floor(Math.random() * posts.length)
     if (posts && 'comments' in posts[postId]) {

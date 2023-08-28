@@ -3,14 +3,8 @@
 import { Box, HStack, Text, useToast } from '@chakra-ui/react'
 import React, { createContext, useCallback, useContext, useMemo } from 'react'
 import { IResponse } from 'types/api'
-
-declare global {
-  interface Window {
-    // The API is a non typescript external asset
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    FakerApi: any
-  }
-}
+import FakerApi from 'utils/fakerApi'
+const fakerApi = new FakerApi()
 
 interface IContextApi {
   // False positive
@@ -40,14 +34,16 @@ export const ContextApiProvider: React.FC<FCProps> = ({
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const toastIdRef = React.useRef<any>()
   /*================================ States ==============================*/
+
   /*================================ Functions ==============================*/
 
   const alertFeedback = useCallback(
     <T,>(response: IResponse<T>, method?: string, url?: string) => {
+      console.log(response)
       const reference = method && url ? `REF: ${method} @ ${url}` : ''
       if (!response) return
       toastIdRef.current = toast({
-        duration: 60 * 1000,
+        duration: 7 * 1000,
         position: 'bottom-right',
         isClosable: true,
         render: () => (
@@ -90,12 +86,13 @@ export const ContextApiProvider: React.FC<FCProps> = ({
   const apiGet = useCallback(
     // eslint-disable-next-line no-unused-vars
     <T, K>(url: string, props: T, action: (data: K) => void) => {
-      window.FakerApi.get(url, props)
+      fakerApi
+        .get(url, props)
         .catch((error: IResponse<void>) => {
           alertFeedback(error, 'GET', url)
         })
         .then((response: IResponse<K>) => {
-          alertFeedback<K>(response)
+          console.log(url, props, response)
           action(response.data)
         })
     },
@@ -104,7 +101,8 @@ export const ContextApiProvider: React.FC<FCProps> = ({
 
   const apiPost = useCallback(
     <T,>(url: string, props: T, action: () => void) => {
-      window.FakerApi.post(url, props)
+      fakerApi
+        .post(url, props)
         .catch((error: IResponse<void>) => {
           alertFeedback(error, 'POST', url)
         })
@@ -118,7 +116,8 @@ export const ContextApiProvider: React.FC<FCProps> = ({
 
   const apiDelete = useCallback(
     <T,>(url: string, props: T, action: () => void) => {
-      window.FakerApi.delete(url, props)
+      fakerApi
+        .delete(url, props)
         .catch((error: IResponse<void>) => {
           alertFeedback(error, 'DELETE', url)
         })
@@ -132,7 +131,8 @@ export const ContextApiProvider: React.FC<FCProps> = ({
 
   const apiPut = useCallback(
     <T,>(url: string, props: T, action: () => void) => {
-      window.FakerApi.put(url, props)
+      fakerApi
+        .put(url, props)
         .catch((error: IResponse<void>) => {
           alertFeedback(error, 'PUT', url)
         })

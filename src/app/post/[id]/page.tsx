@@ -1,7 +1,6 @@
 'use client'
 
-import React, { useCallback, useContext, useEffect, useState } from 'react'
-import { ContextAuth } from 'contexts/Auth'
+import React, { useCallback, useEffect, useState } from 'react'
 import { useParams } from 'next/navigation'
 
 import { IRecordPost } from 'types/api'
@@ -12,7 +11,7 @@ import { useApi } from 'contexts/Api'
 
 export default function RecordsShowPost() {
   /*================================ Constants ==============================*/
-  const { isLoaded } = useContext(ContextAuth)
+
   const params = useParams()
   const { apiGet } = useApi()
   /*================================ States ==============================*/
@@ -31,9 +30,8 @@ export default function RecordsShowPost() {
   }, [apiGet, params.id])
   /*================================ Effects ==============================*/
   useEffect(() => {
-    if (!isLoaded) return
     getPost()
-  }, [getPost, isLoaded])
+  }, [getPost])
   /*================================ Memos ==============================*/
   /*================================ Render ==============================*/
   return (

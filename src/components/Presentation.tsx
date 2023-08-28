@@ -4,7 +4,7 @@ import { Box, Flex, Link, Text } from '@chakra-ui/react'
 
 export const Presentation = ({}): JSX.Element => {
   /*================================ Constants ==============================*/
-  /* const { isLogged, isLoaded } = useContext(ContextAuth) */
+
   /*================================ States ==============================*/
 
   const [mobileFailHover, setMobileFailHover] = useState<boolean>(false)

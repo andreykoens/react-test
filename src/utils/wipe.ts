@@ -1,16 +1,14 @@
 import { IRecordPost } from 'types/api'
 
 export const Wipe = () => {
-  if (!window.FakerApi) return
-
   //create definitions
   console.log('init nuke')
   localStorage.setItem('posts', '[]')
   localStorage.setItem('users', '[]')
-  localStorage.setItem('nextUserId', '0')
-  localStorage.setItem('nextPostId', '0')
-  localStorage.setItem('nextCommentId', '0')
-  localStorage.setItem('auth', '')
+  localStorage.setItem('nextUserId', '1')
+  localStorage.setItem('nextPostId', '1')
+  localStorage.setItem('nextCommentId', '1')
+  localStorage.removeItem('auth')
 
   //reload page
   window.location = window.location

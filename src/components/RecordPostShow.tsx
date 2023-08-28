@@ -39,7 +39,7 @@ export const RecordPostShow = ({ Record }: IRecordPostShow): JSX.Element => {
     ))
   }, [Record.title])
   const RecordAuthor = useMemo(() => {
-    const username = nameIndex.find((e) => e.id === Record.user_id).name
+    const username = nameIndex.find((e) => e.id === Record.user_id)?.name || 'autor desconhecido'
     return username.split('').map((letter) => (
       <Text
         display={'inline-block'}

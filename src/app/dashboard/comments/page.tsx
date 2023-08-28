@@ -12,7 +12,7 @@ import { useApi } from 'contexts/Api'
 
 export default function DashboardCommentsList() {
   /*================================ Constants ==============================*/
-  const { isLoaded, isLogged, user } = useContext(ContextAuth)
+  const { isLogged, user } = useContext(ContextAuth)
   const router = useRouter()
   const { apiGet } = useApi()
   /*================================ States ==============================*/
@@ -36,17 +36,13 @@ export default function DashboardCommentsList() {
 
   /*================================ Effects ==============================*/
   useEffect(() => {
-    if (!isLoaded) return
-    if (isLoaded && !isLogged) {
-      router.push('/')
-    }
     getPosts()
-  }, [getPosts, isLoaded, isLogged, router])
+  }, [getPosts, isLogged, router])
 
   /*================================ Memos ==============================*/
   /*================================ Render ==============================*/
-  if (!user) return <></>
-  if (recordsPosts && recordsPosts.length === 0) {
+
+  if (!recordsPosts || (recordsPosts && recordsPosts.length === 0)) {
     return (
       <Flex
         flexGrow={1}

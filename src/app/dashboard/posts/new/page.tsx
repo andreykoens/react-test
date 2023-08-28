@@ -20,7 +20,7 @@ import { useApi } from 'contexts/Api'
 
 export default function Register() {
   /*================================ Constants ==============================*/
-  const { isLoaded, isLogged } = useContext(ContextAuth)
+  const { isLogged } = useContext(ContextAuth)
   const router = useRouter()
   const { apiPost } = useApi()
   const {
@@ -46,12 +46,7 @@ export default function Register() {
     handleRecordPostNew(data)
   }
   /*================================ Effects ==============================*/
-  useEffect(() => {
-    if (!isLoaded) return
-    if (isLoaded && !isLogged) {
-      router.push('/')
-    }
-  }, [isLoaded, isLogged, router])
+
   /*================================ Memos ==============================*/
   /*================================ Render ==============================*/
   return (
@@ -72,7 +67,7 @@ export default function Register() {
               {...register('title', {
                 required: 'O título é obrigatório',
                 minLength: { value: 15, message: 'Você precisa utilizar pelo menos 15 caracteres' },
-                maxLength: { value: 60, message: 'O limite de 60 caracteres foi excedido' },
+                maxLength: { value: 100, message: 'O limite de 100 caracteres foi excedido' },
               })}
             />
             <FormErrorMessage>{errors.title && errors.title.message}</FormErrorMessage>
