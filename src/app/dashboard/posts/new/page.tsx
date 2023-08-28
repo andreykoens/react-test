@@ -1,9 +1,9 @@
 'use client'
 
-import React, { useCallback, useContext, useEffect, useRef, useState } from 'react'
+import React, { useCallback, useContext, useEffect } from 'react'
 import { ContextAuth } from 'contexts/Auth'
 import { apiPost } from 'utils/api'
-import { IRecordPost, IRegister } from 'types/api'
+import { IRecordPost } from 'types/api'
 import { useRouter } from 'next/navigation'
 import { useForm, SubmitHandler } from 'react-hook-form'
 import {
@@ -31,7 +31,7 @@ export default function Register() {
   /*================================ Functions ==============================*/
   const handleRecordPostNew = useCallback(
     (props: IRecordPost) => {
-      apiPost('/posts/create', props, (data) => {
+      apiPost('/posts/create', props, () => {
         /* If the response returned the id of the post,
       the ideal would be to redirect to the edit page */
         router.push('/dashboard/posts/list')
@@ -63,7 +63,7 @@ export default function Register() {
     >
       <form onSubmit={(e) => e.preventDefault()} style={{ maxWidth: '700px', width: '100%' }}>
         <VStack gap={6} h={'100%'} maxW={'700px'} w={'100%'} margin={'0 auto'}>
-          <FormControl isInvalid={errors.title}>
+          <FormControl isInvalid={!!errors.title}>
             <Input
               size={'lg'}
               placeholder="Título da postagem"
@@ -76,7 +76,7 @@ export default function Register() {
             <FormErrorMessage>{errors.title && errors.title.message}</FormErrorMessage>
           </FormControl>
 
-          <FormControl isInvalid={errors.content} flexGrow={1}>
+          <FormControl isInvalid={!!errors.content} flexGrow={1}>
             <Textarea
               h={'100%'}
               size={'lg'}

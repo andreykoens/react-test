@@ -2,39 +2,36 @@
 
 import React, { useCallback, useContext, useEffect, useState } from 'react'
 import { ContextAuth } from 'contexts/Auth'
-import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { apiDelete, apiPost } from 'utils/api'
-import { IRecordPost, IRecordPostDelete } from 'types/api'
+import { apiPost } from 'utils/api'
+import { IRecordPost } from 'types/api'
 import { v4 } from 'uuid'
-import { CommentSection } from 'components/CommentSection'
+import { Box, Flex, HStack, Heading, SimpleGrid, Text, VStack, Link } from '@chakra-ui/react'
+import { RecordCommentActions } from 'components/RecordCommentActions'
 
 export default function DashboardCommentsList() {
   /*================================ Constants ==============================*/
-  const { isLoaded, isLogged, logout, user } = useContext(ContextAuth)
+  const { isLoaded, isLogged, user } = useContext(ContextAuth)
   const router = useRouter()
   /*================================ States ==============================*/
-  const [recordsPosts, setRecordsPosts] = useState<any>(null)
+  const [recordsPosts, setRecordsPosts] = useState<IRecordPost[]>([])
 
   /*================================ Functions ==============================*/
   const getPosts = useCallback(() => {
     if (!user) return
     apiPost('/posts', {}, (data: Record<string | number, IRecordPost>) => {
       delete data['message']
-      const posts = Object.values(data)
+      const allPosts = Object.values(data)
+      const posts = allPosts.filter((post) => {
+        if (!('comments' in post) || post.comments.length <= 0) return false
+        post.comments = post.comments.filter((comment) => {
+          return comment.user_id === user.id
+        })
+        return post.comments.length > 0
+      })
       setRecordsPosts(posts)
     })
   }, [user])
-
-  const deletePost = useCallback(
-    (data: IRecordPostDelete) => {
-      if (!isLogged) return
-      apiDelete('/posts/remove', { post_id: data.post_id }, () => {
-        getPosts()
-      })
-    },
-    [getPosts, isLogged]
-  )
 
   /*================================ Effects ==============================*/
   useEffect(() => {
@@ -48,33 +45,69 @@ export default function DashboardCommentsList() {
   /*================================ Memos ==============================*/
   /*================================ Render ==============================*/
   if (!user) return <></>
+  if (recordsPosts && recordsPosts.length === 0) {
+    return (
+      <Flex
+        flexGrow={1}
+        justify={'center'}
+        alignItems={'center'}
+        flexDirection={'column'}
+        h={'100%'}
+      >
+        <Heading fontWeight={300}>
+          Nenhum comentário. Que tal comentar{' '}
+          <Link href={'/'} opacity={0.85}>
+            algum post
+          </Link>
+          ?
+        </Heading>
+      </Flex>
+    )
+  }
   return (
-    <main>
-      {/*================== POSTS =================*/}
-      {recordsPosts && recordsPosts.length === 0 && (
-        <div>
-          No posts yet. <Link href={'/dashboard/posts/new'}>Start now</Link>
-        </div>
-      )}
+    <VStack gap={6}>
       {recordsPosts &&
         recordsPosts.map((post: IRecordPost) => (
-          <div
+          <HStack
             key={`post-${v4()}`}
-            style={{ border: '1px solid black', padding: '10px', margin: '0 0 10px 0' }}
+            w={'full'}
+            bg={'#f6f6f6'}
+            borderRadius={30}
+            p={10}
+            align={'flex-start'}
           >
-            <h2>
-              <Link href={`/dashboard/posts/edit/${post.id}`}>{post.title}</Link>
-            </h2>
-            <p>{post.content && post.content.substring(0, 100)}...</p>
-            {post && post.id && post.comments && (
-              <CommentSection
-                post_id={post.id}
-                comments={post.comments.filter((p) => p.user_id === user.id)}
-                allowPost={false}
-              ></CommentSection>
-            )}
-          </div>
+            <Box pr={10} width={'300px'} flexShrink={0}>
+              <Heading size={'md'} mb={5}>
+                {post.user_id === user.id && (
+                  <Link href={`/dashboard/posts/edit/${post.id}`}>{post.title}</Link>
+                )}
+                {post.user_id !== user.id && post.title}
+              </Heading>
+              <Text fontSize={14}>{post.content && post.content.substring(0, 100)}...</Text>
+            </Box>
+            <SimpleGrid columns={3} gap={10} pt={0} flexGrow={1}>
+              {post &&
+                post.id &&
+                post.comments &&
+                post.comments.map((comment) => (
+                  <Box
+                    key={v4()}
+                    background={'#fff'}
+                    p={10}
+                    borderRadius={25}
+                    position={'relative'}
+                  >
+                    {comment.content}
+                    <RecordCommentActions
+                      commentId={comment.id}
+                      postId={post.id}
+                      position={'right'}
+                    ></RecordCommentActions>
+                  </Box>
+                ))}
+            </SimpleGrid>
+          </HStack>
         ))}
-    </main>
+    </VStack>
   )
 }

@@ -1,15 +1,14 @@
 'use client'
 
 import { ContextAuth } from 'contexts/Auth'
-import { usePathname, useRouter } from 'next/navigation'
+import { useRouter } from 'next/navigation'
 import React, { useCallback, useContext, useEffect, useState } from 'react'
-import { IRecordCommentDelete, IRecordComment, IResponseError, IResponse } from 'types/api'
-import { apiDelete, apiGet, apiPost, apiPut } from 'utils/api'
+import { IRecordComment, IResponseError, IResponse } from 'types/api'
+import { apiGet, apiPost } from 'utils/api'
 import { useForm, SubmitHandler } from 'react-hook-form'
 import { v4 } from 'uuid'
 import { alertError, alertErrorApi } from 'utils/alerts'
-import { Box, Button, Center, Flex, SimpleGrid, Text, VStack, keyframes } from '@chakra-ui/react'
-import { getRandomBoolean, getRandomFloat, getRandomInt } from 'utils/math'
+import { Box, Button } from '@chakra-ui/react'
 import { RecordCommentShow } from './RecordCommentShow'
 
 interface ICommentSection {
@@ -18,14 +17,13 @@ interface ICommentSection {
   allowPost: boolean
 }
 interface IRecordCommentEditable extends IRecordComment {
-  contentEdit: string
+  contentEdit?: string
 }
 
-export const CommentSection: React.FC<ICommentSection> = (props) => {
+export const CommentSection = ({ comments, post_id, allowPost }: ICommentSection): JSX.Element => {
   /*================================ Constants ==============================*/
-  const { isLoaded, isLogged, logout, user, nameIndex } = useContext(ContextAuth)
+  const { isLoaded, isLogged } = useContext(ContextAuth)
   const router = useRouter()
-  const { comments, post_id, allowPost } = props
   const {
     register,
     formState: { errors },
@@ -43,15 +41,15 @@ export const CommentSection: React.FC<ICommentSection> = (props) => {
       setCurrentComments(Object.values(data))
     })
   }, [post_id])
-  const deleteComment = useCallback(
-    (data: IRecordCommentDelete) => {
-      if (!isLogged) return
-      apiDelete('/comments/remove', { post_id: data.post_id, comment_id: data.comment_id }, () => {
-        getComments()
-      })
-    },
-    [getComments, isLogged]
-  )
+  // const deleteComment = useCallback(
+  //   (data: IRecordCommentDelete) => {
+  //     if (!isLogged) return
+  //     apiDelete('/comments/remove', { post_id: data.post_id, comment_id: data.comment_id }, () => {
+  //       getComments()
+  //     })
+  //   },
+  //   [getComments, isLogged]
+  // )
   const putComment = useCallback(
     (id: number, data: IRecordCommentEditable) => {
       if (!isLogged) return
@@ -83,7 +81,7 @@ export const CommentSection: React.FC<ICommentSection> = (props) => {
           post_id: post_id,
           comment: data,
         },
-        (data: any) => {
+        () => {
           getComments()
           reset()
         }
@@ -92,10 +90,10 @@ export const CommentSection: React.FC<ICommentSection> = (props) => {
     [getComments, isLogged, post_id, reset]
   )
 
-  const onSubmitNew: SubmitHandler<any> = (data) => {
+  const onSubmitCommentNew: SubmitHandler<IRecordComment> = (data) => {
     postComment(data)
   }
-  const onSubmitEdit: SubmitHandler<any> = (data) => {
+  const onSubmitCommentEdit: SubmitHandler<IRecordCommentEditable> = (data) => {
     data.content = data.contentEdit
     putComment(data.id, data)
     setShowEditComment(false)
@@ -107,11 +105,11 @@ export const CommentSection: React.FC<ICommentSection> = (props) => {
     setCurrentComments(comments)
   }, [comments, isLoaded])
   /*================================ Render ==============================*/
-  if (!props) return <></>
+  if (!isLoaded) return <></>
   return (
     <Box>
-      {allowPost && !isLogged && !showBlock && (
-        <Flex justify={'center'}>
+      <Box textAlign={'center'}>
+        {allowPost && !isLogged && !showBlock && (
           <Button
             px={10}
             py={6}
@@ -124,46 +122,35 @@ export const CommentSection: React.FC<ICommentSection> = (props) => {
           >
             Entre para comentar 📝
           </Button>
-        </Flex>
-      )}
+        )}
+        {allowPost && isLogged && !showBlock && !showEditComment && (
+          <Button
+            px={10}
+            py={6}
+            background={`#eaeaea`}
+            borderRadius={50}
+            fontWeight={500}
+            onClick={() => {
+              setShowBlock((current) => !current)
+            }}
+          >
+            Deixe seu comentário ✏️
+          </Button>
+        )}
+      </Box>
 
       <Box mt={10}>
         {currentComments.length > 0 &&
           currentComments.map((comment) => {
             if (!comment) return <React.Fragment key={v4()}></React.Fragment>
             return (
-              <RecordCommentShow
-                key={`comment-${v4()}`}
-                {...{
-                  Record: comment,
-                  EditAction: () => {
-                    if (!comment.id) return
-                    reset({ ...comment, contentEdit: comment.content })
-                    setShowEditComment(true)
-                    setShowBlock(false)
-                  },
-                  DeleteAction: () => {
-                    if (!comment.id) return
-                    deleteComment({ post_id, comment_id: comment.id })
-                  },
-                }}
-              ></RecordCommentShow>
+              <RecordCommentShow key={v4()} postId={post_id} Record={comment}></RecordCommentShow>
             )
           })}
       </Box>
       {/*================== CommentNew =================*/}
 
       <div>
-        {allowPost && isLogged && !showBlock && !showEditComment && (
-          <button
-            onClick={() => {
-              setShowBlock((current) => !current)
-            }}
-          >
-            Leave a comment
-          </button>
-        )}
-
         {allowPost && isLogged && showBlock && (
           <div style={{ border: '1px solid black', padding: '10px' }}>
             <button
@@ -180,7 +167,7 @@ export const CommentSection: React.FC<ICommentSection> = (props) => {
               <input {...register('content', { required: "You can't leave an empty comment" })} />
               {errors.content && <p>{errors.content.message}</p>}
               <br />
-              <input type="submit" onClick={handleSubmit(onSubmitNew)} />
+              <input type="submit" onClick={handleSubmit(onSubmitCommentNew)} />
             </form>
           </div>
         )}
@@ -208,7 +195,7 @@ export const CommentSection: React.FC<ICommentSection> = (props) => {
               />
               {errors.content && <p>{errors.content.message}</p>}
               <br />
-              <input type="submit" onClick={handleSubmit(onSubmitEdit)} />
+              <input type="submit" onClick={handleSubmit(onSubmitCommentEdit)} />
             </form>
           </div>
         )}

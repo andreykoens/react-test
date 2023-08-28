@@ -1,32 +1,22 @@
 'use client'
 
-import { Box, Heading, Text, keyframes } from '@chakra-ui/react'
-import { ContextAuth, useAuth } from 'contexts/Auth'
-import Link from 'next/link'
-import { usePathname, useRouter } from 'next/navigation'
-import React, { useCallback, useContext, useMemo, useState } from 'react'
-import { randomDrift } from 'styles/theme'
-import { IRecordComment, IRecordPost } from 'types/api'
+import { Box, Text, keyframes } from '@chakra-ui/react'
+import { ContextAuth } from 'contexts/Auth'
+import React, { useContext, useMemo } from 'react'
+import { IRecordComment } from 'types/api'
 import { getRandomBoolean, getRandomInt } from 'utils/math'
-import { Seed } from 'utils/seeder'
-import { CommentSection } from './CommentSection'
 import { v4 } from 'uuid'
-import { ContextMouseEvents, useMouseEvents } from 'contexts/MouseEvent'
 import { eventClipboardCopy } from 'utils/mouseEvents'
+import { RecordCommentActions } from './RecordCommentActions'
 
 interface IRecordCommentShow {
+  postId: number
   Record: IRecordComment
-  EditAction: () => void
-  DeleteAction: () => void
 }
 
-export const RecordCommentShow: React.FC = ({
-  Record,
-  EditAction,
-  DeleteAction,
-}: IRecordCommentShow) => {
+export const RecordCommentShow = ({ Record, postId }: IRecordCommentShow): JSX.Element => {
   /*================================ Constants ==============================*/
-  const { isLoaded, isLogged, logout, user, nameIndex } = useContext(ContextAuth)
+  const { user, nameIndex } = useContext(ContextAuth)
 
   /*================================ States ==============================*/
   /*================================ Functions ==============================*/
@@ -47,16 +37,14 @@ export const RecordCommentShow: React.FC = ({
   return (
     <Box
       key={`comment-${v4()}`}
-      border={'1px solid rgba(0,0,0,0.35)'}
       padding={10}
       verticalAlign={'middle'}
       display={'inline-block'}
       width={'22%'}
-      borderRadius={'20px'}
+      borderRadius={25}
       my={6}
       mx={'1.5%'}
-      backdropBlur={100}
-      background={'#fff'}
+      background={'#f6f6f6'}
       animation={`
                   ${vSwing}
                   ${getRandomInt(30, 50)}s
@@ -66,10 +54,11 @@ export const RecordCommentShow: React.FC = ({
       // transition={'all 150ms ease-in-out'}
       cursor={'pointer'}
       style={{ animationDelay: `${getRandomInt(0, 350)}ms` }}
+      transition={'background 150ms ease-in-out'}
       _hover={{
         animationPlayState: 'paused',
         zIndex: 500,
-        background: '#fdfdfd',
+        background: '#f0f0f0',
       }}
       onClick={(e) => {
         navigator.clipboard.writeText(`${username} diz: ${Record.content}`)
@@ -82,10 +71,15 @@ export const RecordCommentShow: React.FC = ({
       <Text fontWeight={300}>{Record.content}</Text>
 
       {user && user.id === Record.user_id && (
-        <div style={{ float: 'right' }}>
-          <button onClick={EditAction}>Edit</button>
-          <button onClick={DeleteAction}>X</button>
-        </div>
+        <RecordCommentActions
+          commentId={1}
+          postId={postId}
+          position={'bottom'}
+        ></RecordCommentActions>
+        // <div style={{ float: 'right' }}>
+        //   <button onClick={EditAction}>Edit</button>
+        //   <button onClick={DeleteAction}>X</button>
+        // </div>
       )}
     </Box>
   )

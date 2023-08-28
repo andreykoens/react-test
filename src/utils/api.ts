@@ -2,6 +2,8 @@ import { IResponse, IResponseError } from 'types/api'
 import { alertError, alertErrorApi } from './alerts'
 
 interface Dispatcher<T> {
+  // False positive
+  // eslint-disable-next-line no-unused-vars
   (data: T): void
 }
 

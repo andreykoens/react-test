@@ -15,16 +15,17 @@ import {
   Link,
   SimpleGrid,
   Text,
-  VStack,
+  Tooltip,
 } from '@chakra-ui/react'
 import { EmptyList } from 'components/EmptyList'
+import { randomDrift } from 'styles/theme'
 
 export default function DashboardPostsList() {
   /*================================ Constants ==============================*/
-  const { isLoaded, isLogged, logout, user } = useContext(ContextAuth)
+  const { isLoaded, isLogged, user } = useContext(ContextAuth)
   const router = useRouter()
   /*================================ States ==============================*/
-  const [recordsPosts, setRecordsPosts] = useState<any>(null)
+  const [recordsPosts, setRecordsPosts] = useState<IRecordPost[]>([])
 
   /*================================ Functions ==============================*/
   const getPosts = useCallback(() => {
@@ -58,12 +59,21 @@ export default function DashboardPostsList() {
   /*================================ Memos ==============================*/
   /*================================ Render ==============================*/
 
-  if (recordsPosts && recordsPosts.length === 0) return
-  ;<Flex flexGrow={1} justify={'center'} alignItems={'center'} flexDirection={'column'} h={'100%'}>
-    <EmptyList></EmptyList>
-  </Flex>
+  if (recordsPosts && recordsPosts.length === 0) {
+    return (
+      <Flex
+        flexGrow={1}
+        justify={'center'}
+        alignItems={'center'}
+        flexDirection={'column'}
+        h={'100%'}
+      >
+        <EmptyList></EmptyList>
+      </Flex>
+    )
+  }
   return (
-    <SimpleGrid columns={2} gap={10} flexGrow={1} h={'100%'} pt={0}>
+    <SimpleGrid columns={2} gap={10} flexGrow={1} pt={0}>
       {/*================== POSTS =================*/}
       {recordsPosts && recordsPosts.length === 0 && <EmptyList></EmptyList>}
       {recordsPosts &&
@@ -76,28 +86,61 @@ export default function DashboardPostsList() {
             p={10}
             align={'flex-start'}
           >
-            <Box>
-              <Heading mb={5}>
+            <Box pr={10}>
+              <Heading size={'lg'} mb={5}>
                 <Link href={`/dashboard/posts/edit/${post.id}`}>{post.title}</Link>
               </Heading>
               <Text>{post.content && post.content.substring(0, 100)}...</Text>
             </Box>
             <Box width={'80px'}>
-              <Button
-                mb={6}
-                onClick={() => {
-                  router.push(`/dashboard/posts/edit/${post.id}`)
-                }}
+              <Tooltip
+                hasArrow
+                label={'Editar'}
+                placement={'left'}
+                bg={'#626060'}
+                borderRadius={25}
+                color={'white'}
+                px={6}
+                py={4}
               >
-                Editar
-              </Button>
-              <Button
-                onClick={() => {
-                  deletePost({ post_id: post.id })
-                }}
+                <Button
+                  variant={'ghost'}
+                  size={'sm'}
+                  borderRadius={25}
+                  fontSize={30}
+                  mb={4}
+                  _hover={{ background: '#fff' }}
+                  onClick={() => {
+                    router.push(`/dashboard/posts/edit/${post.id}`)
+                  }}
+                >
+                  <Text animation={randomDrift(10, 150 * 60)}>✏️</Text>
+                </Button>
+              </Tooltip>
+              <Tooltip
+                hasArrow
+                label={'Excluir'}
+                placement={'left'}
+                bg={'#cb6751'}
+                borderRadius={25}
+                color={'white'}
+                px={6}
+                py={4}
               >
-                Excluir
-              </Button>
+                <Button
+                  variant={'ghost'}
+                  size={'sm'}
+                  borderRadius={25}
+                  fontSize={30}
+                  mb={4}
+                  _hover={{ background: '#fff' }}
+                  onClick={() => {
+                    deletePost({ post_id: post.id })
+                  }}
+                >
+                  <Text animation={randomDrift(10, 150 * 60)}>🧨</Text>
+                </Button>
+              </Tooltip>
             </Box>
           </HStack>
         ))}

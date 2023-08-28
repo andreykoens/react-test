@@ -1,11 +1,13 @@
 'use client'
 
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
-import { ILogin, IUser } from 'types/api'
+import { ILogin, IRecordUser } from 'types/api'
 import { apiPost } from 'utils/api'
 
 declare global {
   interface Window {
+    // The API is a non typescript external asset
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     FakerApi: any
   }
 }
@@ -17,12 +19,14 @@ interface INameIndexItem {
 
 interface IContextAuth {
   isLoaded: boolean
-  user: IUser
+  user: IRecordUser
   isLogged: boolean
-  login: (props: ILogin) => void
-  logout: () => void
+  // False positive
+  // eslint-disable-next-line no-unused-vars
+  login(props: ILogin): void
+  logout(): void
   nameIndex: INameIndexItem[]
-  buildNameIndex: () => void
+  buildNameIndex(): void
 }
 
 interface FCProps {
@@ -38,7 +42,7 @@ export const ContextAuthProvider: React.FC<FCProps> = ({
 }) => {
   /*================================ Constants ==============================*/
   /*================================ States ==============================*/
-  const [user, setUser] = useState<any>(null)
+  const [user, setUser] = useState<IRecordUser>()
   const [isLogged, setIsLogged] = useState<boolean>(false)
   const [isLoaded, setIsLoaded] = useState<boolean>(false)
   const [nameIndex, setNameIndex] = useState<INameIndexItem[]>([])
@@ -49,14 +53,14 @@ export const ContextAuthProvider: React.FC<FCProps> = ({
     setIsLogged(false)
   }, [])
   const getUserData = useCallback(() => {
-    apiPost('/me', {}, (data: IUser) => {
+    apiPost('/me', {}, (data: IRecordUser) => {
       setUser(data)
       setIsLogged(true)
     })
   }, [])
   const login = useCallback(
     (props: ILogin) => {
-      apiPost<ILogin, ILogin>('/login', props, (data) => {
+      apiPost<ILogin, ILogin>('/login', props, () => {
         getUserData()
       })
     },
@@ -71,7 +75,7 @@ export const ContextAuthProvider: React.FC<FCProps> = ({
 
   const buildNameIndex = useCallback(() => {
     const newNameIndex: INameIndexItem[] = []
-    let rawUsers: any = localStorage.getItem('users')
+    let rawUsers: string = localStorage.getItem('users')
     if (!rawUsers) rawUsers = '[]'
     const users = JSON.parse(rawUsers)
     users.forEach((user) => {
@@ -84,9 +88,11 @@ export const ContextAuthProvider: React.FC<FCProps> = ({
   // Hacky-ish, will work for the mock-up
   useEffect(() => {
     if (!isLogged) {
-      const authCheck = localStorage.getItem('auth')
-      const check = JSON.parse(authCheck)
-      if (check && 'name' in check) setIsLogged(true)
+      const authCheck: string = localStorage.getItem('auth')
+      if (authCheck) {
+        const check = JSON.parse(authCheck)
+        if (check && 'name' in check) setIsLogged(true)
+      }
     }
     if (isLoaded) return
     setTimeout(() => {

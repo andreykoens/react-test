@@ -57,3 +57,5 @@ export interface IRecordCommentDelete {
   post_id: number
   comment_id: number
 }
+
+/*================================ Records ==============================*/

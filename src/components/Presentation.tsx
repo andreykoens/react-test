@@ -1,13 +1,8 @@
-import React, { useCallback, useMemo, useState } from 'react'
+import React, { useCallback, useState } from 'react'
 
-import { Image, Box, Flex, Heading, Link, Text } from '@chakra-ui/react'
-import { relative } from 'path'
-import { randomJump } from 'styles/theme'
-import { getRandomInt, mapRange } from 'utils/math'
-import { v4 } from 'uuid'
-import { EmptyList } from './EmptyList'
+import { Box, Flex, Link, Text } from '@chakra-ui/react'
 
-export const Presentation: React.FC = ({}) => {
+export const Presentation = ({}): JSX.Element => {
   /*================================ Constants ==============================*/
   /* const { isLogged, isLoaded } = useContext(ContextAuth) */
   /*================================ States ==============================*/
@@ -16,7 +11,7 @@ export const Presentation: React.FC = ({}) => {
 
   /*================================ Functions ==============================*/
   const noMobileShock = useCallback((e) => {
-    let el = document.createElement('div')
+    const el = document.createElement('div')
     el.id = 'MobileShockEmo'
     setTimeout(() => {
       el.style.opacity = '1'

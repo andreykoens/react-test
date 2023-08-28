@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useCallback, useContext, useEffect, useRef, useState } from 'react'
+import React, { useCallback, useContext, useEffect, useRef } from 'react'
 import { ContextAuth } from 'contexts/Auth'
 import { apiPost } from 'utils/api'
 import { IRegister } from 'types/api'
@@ -16,7 +16,6 @@ import {
   Input,
   InputGroup,
   InputRightElement,
-  Spacer,
   VStack,
 } from '@chakra-ui/react'
 
@@ -40,7 +39,7 @@ export default function Register() {
   /*================================ Functions ==============================*/
   const handleRegister = useCallback(
     (props: IRegister) => {
-      apiPost('/register', props, (data) => {
+      apiPost('/register', props, () => {
         router.push('/')
       })
     },
@@ -70,7 +69,7 @@ export default function Register() {
       <form onSubmit={(e) => e.preventDefault()}>
         <VStack gap={6}>
           <Heading fontWeight={300}>Cadastro</Heading>
-          <FormControl isInvalid={errors.username}>
+          <FormControl isInvalid={!!errors.username}>
             <Input
               size={'lg'}
               placeholder="Nome de usuário"
@@ -86,7 +85,7 @@ export default function Register() {
             />
             <FormErrorMessage>{errors.username && errors.username.message}</FormErrorMessage>
           </FormControl>
-          <FormControl isInvalid={errors.name}>
+          <FormControl isInvalid={!!errors.name}>
             <Input
               size={'lg'}
               placeholder="Nome completo"
@@ -97,7 +96,7 @@ export default function Register() {
             />
             <FormErrorMessage>{errors.name && errors.name.message}</FormErrorMessage>
           </FormControl>
-          <FormControl isInvalid={errors.password}>
+          <FormControl isInvalid={!!errors.password}>
             <InputGroup size="md">
               <Input
                 size={'lg'}
@@ -129,7 +128,7 @@ export default function Register() {
             </InputGroup>
             <FormErrorMessage>{errors.password && errors.password.message}</FormErrorMessage>
           </FormControl>
-          <FormControl isInvalid={errors.passwordconfirm}>
+          <FormControl isInvalid={!!errors.passwordconfirm}>
             <Input
               size={'lg'}
               placeholder="Confirmar senha"

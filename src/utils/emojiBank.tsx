@@ -1,4 +1,4 @@
-import { getRandomInt, getWeightedRandom, weightedRandom } from './math'
+import { getRandomInt } from './math'
 
 export const emojiBank: string[] = [
   '〰',
@@ -1487,7 +1487,7 @@ export const emojiBank: string[] = [
 export const emojifySentence = (text: string): string => {
   const amountEmoji = getRandomInt(0, 1)
   const trailingChance = 0.3
-  let textSplit = text.split(' ')
+  const textSplit = text.split(' ')
   for (let i = 0; i <= amountEmoji; i++) {
     textSplit.splice(
       Math.floor(Math.random() * textSplit.length),
@@ -1502,7 +1502,7 @@ export const emojifySentence = (text: string): string => {
 
 export const emojifyBetweenWords = (text: string): string => {
   text.replace(/\n/g, 'NEWLINE')
-  let textSplit = text.split(' ')
+  const textSplit = text.split(' ')
   const amountEmoji = Math.floor(Math.random() * (text.split.length * 0.6)) + 2
   for (let i = 0; i <= amountEmoji; i++) {
     textSplit.splice(

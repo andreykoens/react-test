@@ -1,8 +1,7 @@
 'use client'
 
-import React, { useCallback, useContext, useEffect, useRef, useState } from 'react'
+import React, { useCallback, useContext, useEffect, useRef } from 'react'
 import { ContextAuth } from 'contexts/Auth'
-import { apiPost } from 'utils/api'
 import { ILogin } from 'types/api'
 import { useRouter } from 'next/navigation'
 import { useForm, SubmitHandler } from 'react-hook-form'
@@ -16,7 +15,6 @@ import {
   Input,
   InputGroup,
   InputRightElement,
-  Spacer,
   VStack,
 } from '@chakra-ui/react'
 
@@ -66,7 +64,7 @@ export default function Login() {
       <form onSubmit={(e) => e.preventDefault()}>
         <VStack gap={6}>
           <Heading fontWeight={300}>Login</Heading>
-          <FormControl isInvalid={errors.username}>
+          <FormControl isInvalid={!!errors.username}>
             <Input
               size={'lg'}
               placeholder="Nome de usuário"
@@ -77,7 +75,7 @@ export default function Login() {
             <FormErrorMessage>{errors.username && errors.username.message}</FormErrorMessage>
           </FormControl>
 
-          <FormControl isInvalid={errors.password}>
+          <FormControl isInvalid={!!errors.password}>
             <InputGroup size="md">
               <Input
                 size={'lg'}
@@ -118,7 +116,7 @@ export default function Login() {
             >
               Preciso me cadastrar
             </Button>
-            <Button size={'md'} onClick={handleSubmit(onSubmit)}>
+            <Button type={'submit'} size={'md'} onClick={handleSubmit(onSubmit)}>
               Entrar
             </Button>
           </HStack>

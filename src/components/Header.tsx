@@ -5,28 +5,23 @@ import {
   Button,
   Flex,
   Heading,
-  Image,
   Popover,
   PopoverArrow,
   PopoverBody,
-  PopoverCloseButton,
   PopoverContent,
-  PopoverHeader,
   PopoverTrigger,
   Spacer,
   Text,
-  keyframes,
 } from '@chakra-ui/react'
 import { ContextAuth } from 'contexts/Auth'
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
-import React, { useCallback, useContext, useState } from 'react'
+import React, { useContext } from 'react'
 import { randomDrift } from 'styles/theme'
-import { Nuke, Seed } from 'utils/seeder'
-import { Presentation } from './Presentation'
-import { th } from '@faker-js/faker'
+import { SeedGeneric } from 'utils/seed'
+import { Wipe } from 'utils/wipe'
 
-export const Header: React.FC = ({}) => {
+export const Header = ({}): JSX.Element => {
   /*================================ Constants ==============================*/
   const { isLogged, logout, user } = useContext(ContextAuth)
   const router = useRouter()
@@ -60,20 +55,22 @@ export const Header: React.FC = ({}) => {
 
       <Box position={'fixed'} top={0} h={'100px'} w={'full'} zIndex={50}>
         <Heading fontSize={120} position={'fixed'} textAlign={'center'} w={'full'} mt={4}>
-          <Button
-            className="seedButton"
-            variant={'ghost'}
-            mr={-20}
-            mt={16}
-            borderRadius={50}
-            animation={randomDrift(50, 150 * 60)}
-            fontSize={60}
-            onClick={() => {
-              Seed()
-            }}
-          >
-            🍃
-          </Button>
+          {!pathname.includes('dashboard') && (
+            <Button
+              className="seedButton"
+              variant={'ghost'}
+              mr={-20}
+              mt={16}
+              borderRadius={50}
+              animation={randomDrift(50, 150 * 60)}
+              fontSize={60}
+              onClick={() => {
+                SeedGeneric()
+              }}
+            >
+              🍃
+            </Button>
+          )}
           <Link href={'/'}>
             <Text display={'inline'} fontWeight={600}>
               Gibberish
@@ -82,21 +79,23 @@ export const Header: React.FC = ({}) => {
               ™️
             </Text>
           </Link>
-          <Button
-            className="nukeButton"
-            variant={'ghost'}
-            ml={-20}
-            mt={16}
-            borderRadius={50}
-            animation={randomDrift(50, 150 * 60)}
-            fontSize={60}
-            onClick={() => {
-              logout()
-              Nuke()
-            }}
-          >
-            💥
-          </Button>
+          {!pathname.includes('dashboard') && (
+            <Button
+              className="nukeButton"
+              variant={'ghost'}
+              ml={-20}
+              mt={16}
+              borderRadius={50}
+              animation={randomDrift(50, 150 * 60)}
+              fontSize={60}
+              onClick={() => {
+                logout()
+                Wipe()
+              }}
+            >
+              💥
+            </Button>
+          )}
         </Heading>
 
         <Flex p={7} width={'full'}>

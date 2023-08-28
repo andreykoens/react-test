@@ -1,14 +1,12 @@
 'use client'
 
 import { Box, Heading, Text } from '@chakra-ui/react'
-import { ContextAuth, useAuth } from 'contexts/Auth'
+import { ContextAuth } from 'contexts/Auth'
 import Link from 'next/link'
-import { usePathname, useRouter } from 'next/navigation'
-import React, { useCallback, useContext, useMemo, useState } from 'react'
+import React, { useContext, useMemo } from 'react'
 import { randomDrift, randomJump } from 'styles/theme'
 import { IRecordPost } from 'types/api'
 import { getRandomInt } from 'utils/math'
-import { Seed } from 'utils/seeder'
 import { CommentSection } from './CommentSection'
 import { v4 } from 'uuid'
 
@@ -16,9 +14,9 @@ interface IRecordPostShow {
   Record: IRecordPost
 }
 
-export const RecordPostShow: React.FC = ({ Record }: IRecordPostShow) => {
+export const RecordPostShow = ({ Record }: IRecordPostShow): JSX.Element => {
   /*================================ Constants ==============================*/
-  const { isLogged, isLoaded, nameIndex } = useContext(ContextAuth)
+  const { nameIndex } = useContext(ContextAuth)
   /*================================ States ==============================*/
   /*================================ Functions ==============================*/
   /*================================ Effects ==============================*/
@@ -61,9 +59,6 @@ export const RecordPostShow: React.FC = ({ Record }: IRecordPostShow) => {
       </Text>
     ))
   }, [Record.content])
-  const rDriftAuthor = useMemo(() => {
-    return randomDrift(50, 800 * 60)
-  }, [])
   /*================================ Render ==============================*/
   return (
     <Box className="RecordPost" p={6} mb={100} textAlign={'center'}>

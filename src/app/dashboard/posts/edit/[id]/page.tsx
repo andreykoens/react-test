@@ -1,11 +1,11 @@
 'use client'
 
-import React, { useCallback, useContext, useEffect, useRef, useState } from 'react'
+import React, { useCallback, useContext, useEffect } from 'react'
 import { ContextAuth } from 'contexts/Auth'
-import { apiGet, apiPost, apiPut } from 'utils/api'
-import { IRecordPost, IRegister } from 'types/api'
-import { useRouter, useParams } from 'next/navigation'
-import { useForm, SubmitHandler } from 'react-hook-form'
+import { apiGet, apiPut } from 'utils/api'
+import { IRecordPost } from 'types/api'
+import { useParams, useRouter } from 'next/navigation'
+import { SubmitHandler, useForm } from 'react-hook-form'
 import {
   Box,
   Button,
@@ -34,9 +34,14 @@ export default function DashboardPostsUpdate() {
   /*================================ Functions ==============================*/
   const handleRecordPostUpdate = useCallback((props: IRecordPost) => {
     console.log(props)
-    apiPut('/posts/update', props.id, { title: props.title, content: props.content }, (data) => {
-      console.log('ok!')
-    })
+    apiPut(
+      '/posts/update',
+      String(props.id),
+      { title: props.title, content: props.content },
+      () => {
+        console.log('ok!')
+      }
+    )
   }, [])
 
   const getPost = useCallback(() => {
@@ -75,7 +80,7 @@ export default function DashboardPostsUpdate() {
     >
       <form onSubmit={(e) => e.preventDefault()} style={{ maxWidth: '700px', width: '100%' }}>
         <VStack gap={6} h={'100%'} maxW={'700px'} w={'100%'} margin={'0 auto'}>
-          <FormControl isInvalid={errors.title}>
+          <FormControl isInvalid={!!errors.title}>
             <Input
               size={'lg'}
               placeholder="Título da postagem"
@@ -88,7 +93,7 @@ export default function DashboardPostsUpdate() {
             <FormErrorMessage>{errors.title && errors.title.message}</FormErrorMessage>
           </FormControl>
 
-          <FormControl isInvalid={errors.content} flexGrow={1}>
+          <FormControl isInvalid={!!errors.content} flexGrow={1}>
             <Textarea
               h={'100%'}
               size={'lg'}

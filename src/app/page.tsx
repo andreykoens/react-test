@@ -2,25 +2,20 @@
 
 import React, { useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import { ContextAuth } from 'contexts/Auth'
-import Link from 'next/link'
-import { useRouter } from 'next/navigation'
 import { apiPost } from 'utils/api'
 import { IRecordPost } from 'types/api'
-import { CommentSection } from 'components/CommentSection'
 import { v4 } from 'uuid'
-import { EmptyList } from 'components/EmptyList'
-import { Box, HStack, Heading, Text, VStack, keyframes } from '@chakra-ui/react'
+import { Heading, Text, VStack } from '@chakra-ui/react'
 import { randomDrift } from 'styles/theme'
-import { getRandomInt } from 'utils/math'
 import { RecordPostShow } from 'components/RecordPostShow'
 import { Presentation } from 'components/Presentation'
 
 export default function Home() {
   /*================================ Constants ==============================*/
-  const { isLoaded, isLogged, logout, user, nameIndex } = useContext(ContextAuth)
-  const router = useRouter()
+  const { isLoaded } = useContext(ContextAuth)
+
   /*================================ States ==============================*/
-  const [recordsPosts, setRecordsPosts] = useState<any>(null)
+  const [recordsPosts, setRecordsPosts] = useState<IRecordPost[]>([])
 
   /*================================ Functions ==============================*/
   const getPosts = useCallback(() => {
@@ -52,7 +47,7 @@ export default function Home() {
   if (recordsPosts && recordsPosts.length === 0) return <Presentation></Presentation>
   if (recordsPosts && recordsPosts.length > 0)
     return (
-      <VStack>
+      <VStack maxW={'1200px'} mx={'auto'}>
         <>
           {recordsPosts.map((post: IRecordPost) => (
             <RecordPostShow key={`post-${v4()}`} {...{ Record: post }}></RecordPostShow>

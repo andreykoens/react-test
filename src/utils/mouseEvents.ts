@@ -1,5 +1,5 @@
 export const eventClipboardCopy = (posX: number, posY: number) => {
-  let el = document.createElement('div')
+  const el = document.createElement('div')
   el.id = 'AnimCopy'
   setTimeout(() => {
     el.remove()

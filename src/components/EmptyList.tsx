@@ -1,12 +1,11 @@
 'use client'
 
 import { Box, Button, Link, Heading } from '@chakra-ui/react'
-import { ContextAuth, useAuth } from 'contexts/Auth'
-import { usePathname, useRouter } from 'next/navigation'
-import React, { useCallback, useContext, useState } from 'react'
-import { Seed } from 'utils/seeder'
+import { ContextAuth } from 'contexts/Auth'
+import React, { useContext } from 'react'
+import { SeedGeneric } from 'utils/seed'
 
-export const EmptyList: React.FC = ({}) => {
+export const EmptyList = ({}): JSX.Element => {
   /*================================ Constants ==============================*/
   const { isLogged, isLoaded } = useContext(ContextAuth)
   /*================================ States ==============================*/
@@ -39,7 +38,7 @@ export const EmptyList: React.FC = ({}) => {
             px={3}
             _hover={{ background: '#f6f6f6' }}
             onClick={() => {
-              Seed()
+              SeedGeneric()
             }}
           >
             Quer ir direto pro blá blá blá? Você pode usar um seed.

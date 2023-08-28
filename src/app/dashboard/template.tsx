@@ -1,17 +1,20 @@
 'use client'
 
-import React, { useCallback, useContext, useEffect, useMemo, useState } from 'react'
-import { Box, Button, Flex, Heading, Spacer, Text, VStack } from '@chakra-ui/react'
+import React, { useCallback, useContext, useEffect, useState } from 'react'
+import { Box, Button, Flex, HStack, Heading, Text, Tooltip, VStack } from '@chakra-ui/react'
 import { usePathname, useRouter } from 'next/navigation'
 import { apiPost } from 'utils/api'
 import { IRecordPost } from 'types/api'
 import { ContextAuth } from 'contexts/Auth'
+import { SeedByUserComments, SeedByUserPosts } from 'utils/seed'
+import { randomDrift } from 'styles/theme'
+import { WipeByUserComments, WipeByUserPosts } from 'utils/wipe'
 
 export default function TemplateDashboard({ children }) {
   /*================================ Constants ==============================*/
   const router = useRouter()
   const pathname = usePathname()
-  const { isLoaded, isLogged, logout, user, nameIndex } = useContext(ContextAuth)
+  const { isLoaded, isLogged, user } = useContext(ContextAuth)
   /*================================ States ==============================*/
   const [currentCommentsAmount, setCurrentCommentsAmout] = useState<number>(0)
   const [currentPostsAmount, setCurrentPostsAmout] = useState<number>(0)
@@ -19,7 +22,6 @@ export default function TemplateDashboard({ children }) {
   const getPosts = useCallback(() => {
     if (!user) return
     apiPost('/posts', {}, (data: Record<string | number, IRecordPost>) => {
-      console.log(data)
       let newCommentsAmount = 0
       let newPostsAmount = 0
       Object.values(data).forEach((post) => {
@@ -77,6 +79,93 @@ export default function TemplateDashboard({ children }) {
           >
             Novo Post
           </Button>
+          <Tooltip
+            hasArrow
+            label={'Seed'}
+            placement={'left'}
+            bg={'#7b6c19'}
+            borderRadius={25}
+            color={'white'}
+            px={6}
+            py={4}
+          >
+            <HStack background={'#fff'} w={'full'} borderRadius={25} px={4} position={'relative'}>
+              <Text
+                flexGrow={0}
+                width={0}
+                fontSize={30}
+                animation={randomDrift(7, 150 * 60)}
+                position={'absolute'}
+                left={-4}
+              >
+                🍃
+              </Text>
+              <Button
+                variant={'ghost'}
+                borderRadius={25}
+                flexGrow={1}
+                onClick={() => {
+                  SeedByUserPosts(user.id)
+                }}
+              >
+                Posts
+              </Button>
+              <Button
+                variant={'ghost'}
+                borderRadius={25}
+                flexGrow={1}
+                onClick={() => {
+                  SeedByUserComments(user.id)
+                }}
+              >
+                Comentários
+              </Button>
+            </HStack>
+          </Tooltip>
+          <Tooltip
+            hasArrow
+            label={'Wipe'}
+            placement={'left'}
+            bg={'#cb6751'}
+            borderRadius={25}
+            color={'white'}
+            px={6}
+            py={4}
+          >
+            <HStack background={'#fff'} w={'full'} borderRadius={25} px={4} position={'relative'}>
+              <Text
+                flexGrow={0}
+                width={0}
+                fontSize={30}
+                animation={randomDrift(7, 150 * 60)}
+                position={'absolute'}
+                left={-4}
+              >
+                💥
+              </Text>
+              <Button
+                variant={'ghost'}
+                borderRadius={25}
+                flexGrow={1}
+                onClick={() => {
+                  WipeByUserPosts(user.id)
+                }}
+              >
+                Posts
+              </Button>
+              <Button
+                variant={'ghost'}
+                borderRadius={25}
+                flexGrow={1}
+                onClick={() => {
+                  WipeByUserComments(user.id)
+                }}
+              >
+                Comentários
+              </Button>
+            </HStack>
+          </Tooltip>
+
           <Box
             py={10}
             textAlign={'center'}
